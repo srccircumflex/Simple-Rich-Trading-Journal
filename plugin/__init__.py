@@ -37,7 +37,7 @@ def init_history(history_data: dict[int, dict]) -> bool:
 
 
 # <row record> fields:
-# (except for `id` and `cat`, all fields can be unset or filled with `None`)
+# (except for "id" and "cat", all fields can be unset or filled with `None`)
 # {
 #       id                 <int>
 #       cat                <
