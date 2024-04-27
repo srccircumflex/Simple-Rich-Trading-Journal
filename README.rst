@@ -232,5 +232,5 @@ Nice to know
 .. _plotly: https://plotly.com/
 .. _Python interpreter: https://www.python.org/
 .. _rconfig.py: ./rconfig.py
-.. _plugin.init_log: ./plugin/__init__.py#53
+.. _plugin.init_log: ./plugin/__init__.py#n53
 .. _plugin/__init__.py: ./plugin/__init__.py
