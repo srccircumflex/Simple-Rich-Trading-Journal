@@ -57,12 +57,14 @@ if _plugin:
 
     rc.coursePluginUpdateInterval = 1
 
-    def course_call(row_data: dict) -> float | None:
-        if c := row_data.get("InvestCourse"):
-            if make.randint(0, 1):
-                return c * (1 + make.randrate2())
-            else:
-                return c * (1 - make.randrate2())
+    def course_call(row_data: dict) -> None:
+        c = row_data["InvestCourse"]
+        if make.randint(0, 1):
+            c *= (1 + make.randrate2())
+        else:
+            c *= (1 - make.randrate2())
+        row_data["TakeCourse"] = c
+        row_data["TakeAmount"] = row_data["n"]
 
 
     plugin.course_call = course_call
