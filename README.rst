@@ -10,11 +10,9 @@ Simple Rich Trading Protocol
 .. image:: ./_doc/main.png
     :align: center
 
-..
-
-    0.1 #1 (2024-04-27)
-        The project is still being worked on and further tests are pending.
-        The basic function is perfect.
+0.1 #1 (2024-04-27)
+    The project is still being worked on and further tests are pending.
+    The basic function is perfect.
 
 Install and Run
 ===============
