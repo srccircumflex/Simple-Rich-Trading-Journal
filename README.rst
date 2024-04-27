@@ -227,7 +227,7 @@ Nice to know
 
 ----
 
- The project was realized with libraries from plotly_ in the community edition.
+ The project was realized with the opensource packages from plotly_.
 
 .. _plotly: https://plotly.com/
 .. _Python interpreter: https://www.python.org/
