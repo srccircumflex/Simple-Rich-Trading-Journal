@@ -218,6 +218,8 @@ Nice to know
 
 - To import data, :html:`<a href="./plugin/__init__.py#L53">plugin.init_log</a>` could be implemented.
 
+`plugin.init_log`_
+
 - Look at `plugin/__init__.py`_
 
 - If internal errors occur after editing, a red stripe appears.
@@ -232,5 +234,5 @@ Nice to know
 .. _plotly: https://plotly.com/
 .. _Python interpreter: https://www.python.org/
 .. _rconfig.py: ./rconfig.py
-.. _plugin.init_log: ./plugin/__init__.py#n53
+.. _plugin.init_log: ./plugin/__init__.py#L53
 .. _plugin/__init__.py: ./plugin/__init__.py
