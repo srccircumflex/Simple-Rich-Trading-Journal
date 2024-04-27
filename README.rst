@@ -214,11 +214,11 @@ Nice to know
 
 - The size of the side section can be changed: drag/double-click the separator
 
-- Look at ``rconfig.py``
+- Look at `rconfig.py`_
 
-- To import data, ``plugin.init_log`` could be implemented.
+- To import data, `plugin.init_log`_ could be implemented.
 
-- Look at ``plugin/__init__.py``
+- Look at `plugin/__init__.py`_
 
 - If internal errors occur after editing, a red stripe appears.
   This disappears after the next edit without errors.
@@ -231,3 +231,6 @@ Nice to know
 
 .. _plotly: https://plotly.com/
 .. _Python interpreter: https://www.python.org/
+.. _rconfig.py: ./rconfig.py
+.. _plugin.init_log: ./plugin/__init__.py
+.. _plugin/__init__.py: ./plugin/__init__.py
