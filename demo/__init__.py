@@ -67,11 +67,9 @@ if _plugin:
 
     plugin.course_call = course_call
 
-    def symbol_call(update_data: dict) -> dict:
+    def symbol_call(update_data: dict) -> None:
         if asset := make.example_assets.get(update_data["value"]):
-            return update_data["data"] | {"Symbol": asset[2], "Type": asset[1]}
-        else:
-            return update_data["data"]
+            update_data["data"] |= {"Symbol": asset[2], "Type": asset[1]}
 
     plugin.symbol_call = symbol_call
 

@@ -798,15 +798,18 @@ class LogCalc:
         if triggered_col == "Note":
             relevant_summary = False
         elif triggered_col == "Name":
-            upd_row = plugin.symbol_call(update)
+            plugin.symbol_call(update)
+            upd_row = update["data"]
             relevant_summary = upd_row.get("n") == 0
             relevant_id = True
         elif triggered_col == "Symbol":
-            upd_row = plugin.symbol_call(update)
+            plugin.symbol_call(update)
+            upd_row = update["data"]
             relevant_summary = False
             relevant_id = True
         elif triggered_col == "Type":
-            upd_row = plugin.symbol_call(update)
+            plugin.symbol_call(update)
+            upd_row = update["data"]
             relevant_summary = False
             relevant_id = True
         elif update.get("value") is None:  # cell delete

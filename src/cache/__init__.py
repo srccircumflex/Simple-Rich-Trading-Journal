@@ -32,8 +32,8 @@ def init():
     except FileNotFoundError:
         HISTORY_DATA = {i: {"time": i, "data": __firstrun} for i in range(rc.nHistorySlots)}
 
-    INIT_DATA, do_dump = plugin.init_log(INIT_DATA)
-    HISTORY_DATA, make_hist = plugin.init_history(HISTORY_DATA)
+    do_dump = plugin.init_log(INIT_DATA)
+    make_hist = plugin.init_history(HISTORY_DATA)
 
     HISTORY_KEYS_X_TIME_REVSORT = list((k, v["time"]) for k, v in HISTORY_DATA.items())
     HISTORY_KEYS_X_TIME_REVSORT.sort(key=lambda x: x[1], reverse=True)
