@@ -216,7 +216,7 @@ Nice to know
 
 - Look at `rconfig.py`_
 
-- To import data, :html:`<a href="./plugin/__init__.py#n53">plugin.init_log</a>` could be implemented.
+- To import data, :html:`<a href="./plugin/__init__.py#L53">plugin.init_log</a>` could be implemented.
 
 - Look at `plugin/__init__.py`_
 
