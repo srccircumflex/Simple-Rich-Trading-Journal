@@ -343,7 +343,7 @@ def call(
 
     def save():
         if i_auto_save_n_clicks:
-            cache.dump(__lc__.__mainFrame__.__get_log_json__())
+            cache.dump_log(__lc__.__mainFrame__.__get_log_json__())
 
     def set_index_by():
         nonlocal o_index_by_button_style, o_index_by_button_children, o_scope_by_button_style
@@ -426,7 +426,7 @@ def call(
         elif __trigger__ == layout.header.auto_save_button.id:
             set_auto_save(i_auto_save_n_clicks)
             if o_auto_save_n_clicks:
-                cache.dump(i_tradinglog_rowData)
+                cache.dump_log(i_tradinglog_rowData)
 
         # load backup
         elif __trigger__ == layout.history.history_list.id:

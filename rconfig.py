@@ -59,6 +59,9 @@ statisticsPopGraphSize: int = 2000
 statisticsOpenPositionsGraphSize: int = 500
 statisticsAllPositionsGraphSize: int = 500
 statisticsSunMaxDepth: int = 4
+#   Color cache
+#       [i] delete the cachefile to reset the cache
+statisticsUsePositionColorCache: Literal[0, 1] = 1
 
 # Upper limit of history entries
 nHistorySlots: int = 10

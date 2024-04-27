@@ -88,9 +88,9 @@ General information
     | ``[dd][mm][yy][HH][MM]``
 
     | With the exception of the last field from the left, all fields must have two digits.
-    | Characters from ``[ .,:/-]`` are allowed between the fields but are not required. If fields
-    | are omitted, they are filled from the current date. To apply the current date in full,
-    | a character from ``[n#0]`` can be entered.
+    Characters from ``[ .,:/-]`` are allowed between the fields but are not required. If fields
+    are omitted, they are filled from the current date. To apply the current date in full,
+    a character from ``[n#0]`` can be entered.
 
 - ITC stands for 'Interests, Taxes and other Costs or Income'.
 
@@ -101,11 +101,11 @@ Trades
 
 Enter a value greater than ``0`` in the column *n* and define the cells of the columns
 *InvestTime* and *InvestAmount* or *InvestCourse* to open a trade. The value from the
-*ITC* column is subtracted or added to the amount in the calculations.
+*ITC* column is subtracted or added to the final profit in the calculations.
 
 If a value is entered in *TakeAmount* or *TakeCourse* but not in *TakeTime*, the trade
-is still considered to be open, the row is calculated and, if *with open* is active,
-also the footer of the summary and a visible side section.
+is still considered to be open, the *Profit* and *Performance* cell is calculated and,
+if ``with open`` is active, also the summary footer and a visible side section.
 
 .. image:: ./_doc/tow.png
     :align: center
@@ -124,19 +124,16 @@ Enter a ``0`` in the column *n* and define the cells of the columns *InvestTime*
 *InvestAmount* to define a deposit. The value from the *ITC* column is subtracted or
 added to the amount in the calculations.
 
-Entries in the column group *Take* are not accepted, these are defined by the program
-based on following payouts.
-
-.. image:: ./_doc/dep2.png
-    :align: center
-
-If the amount is exhausted, the deposit is considered exhausted and will no longer receive
-any profit values from the time of exhaustion.
-
 The column *Profit* contains the sum of the profits of the following trades in relation to
 non-exhausted previous or interim deposits. *Performance* is then calculated in relation to
 the amount. The value in *Dividend* is calculated like *Profit*.
 
+Entries in the column group *Take* are not accepted, these are defined by the program
+based on following payouts. Once the amount has been exhausted, the deposit record
+will no longer receive a profit value from that point on.
+
+.. image:: ./_doc/dep2.png
+    :align: center
 
 Payouts
 -------
@@ -144,11 +141,11 @@ Payouts
     :align: center
 
 Enter a ``0`` in the column *n* and define the cells of the columns *TakeTime* and
-*TakeAmount* to define a payout. The value from the *ITC* column is subtracted or
-added to the amount in the calculations.
+*TakeAmount* to define a payout. The value from the *ITC* column is subtracted
+or added to the amount in the calculations.
 
 Payouts are deducted from the sum of deposits, but not from profits. However, if the
-payouts exceed the available money, a ITC entry is created from the remaining amount.
+payouts exceed the available money, a ITC record is created from the remaining amount.
 
 Entries in the column group *Invest* are not accepted.
 
@@ -160,16 +157,19 @@ Dividends
     :align: center
 
 For a dividend record it is important to enter a *Name* first, then enter a ``0`` in
-the column *n* and define the cells of the columns *TakeTime* and *TakeAmount* or *TakeCourse*.
+the column *n* and define the cells of the columns *TakeTime* and *TakeAmount* or
+*TakeCourse*.
 
 Entries in the column group *Invest* or column *ITC* are not accepted.
 
 If the dividend is defined in column *TakeCourse*, its amount is calculated with the sum of
-column *n* of previous associated trades. The *ITC* column represents the sum of the *InvestAmount*'s
-of those trades. This is then used to calculate *Performance* to represent the dividend rate.
+column *n* of previous associated trades. The *ITC* column represents the sum of the
+*InvestAmount*'s of those trades. This is then used to calculate *Performance* to represent
+the dividend rate.
 
-A trade belongs to the dividend if the *Name* is identical and it is open at the time of the dividend.
-The *Dividend* column of these associated trades is calculated in proportion to the *InvestAmount*.
+A trade belongs to the dividend if the *Name* is identical and it is open at the time of the
+dividend. The *Dividend* column of these associated trades is calculated in proportion to the
+*InvestAmount*.
 
 .. image:: ./_doc/div2.png
     :align: center
@@ -181,7 +181,7 @@ Interests, Taxes and other Costs or Income (ITC)
     :align: center
 
 Enter a ``0`` in the column *n* and define the cell of the column *ITC* and
-*InvestTime* or *TakeTime* to define a ITC.
+*InvestTime* or *TakeTime* to define a ITC record.
 
 A ITC record is deducted or added to the profit.
 
@@ -200,9 +200,11 @@ Nice to know
     | Supported actions:
     - ctrl+c: write a cell content to the clipboard.
     - ctrl+x: write a cell content to the clipboard and delete it from the log.
-    - ctrl+a: write a row to the clipboard.
+    - ctrl+a, ctrl+y, ctrl+z: write a row to the clipboard.
     - ctrl+shift+x: write a row to the clipboard and delete it from the log.
     - ctrl+v: insert the content.
+
+- Confirm an entry in *InvestAmount* or *TakeAmount* with Enter, **not with Tap** (BUG).
 
 - Side sections are only calculated if they are visible. If many edits are made, they should be hidden.
 

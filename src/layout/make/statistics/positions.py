@@ -4,9 +4,7 @@ from typing import Literal
 import plotly.graph_objects as go
 
 from src.calc.log import LogCalc, _Trade
-from src.config import styles, rc
-
-_colorPalette = styles.figures.color_palette_donut.copy()
+from src.config import rc
 
 
 class _Positions:
@@ -40,22 +38,6 @@ class _Positions:
     def get(self):
         if self.new_calc:
             self.new_calc = False
-
-            __colorPalette = _colorPalette.copy()
-            __colorCache = dict()
-
-            def get_color(_key):
-                nonlocal __colorPalette
-                try:
-                    return __colorCache[_key]
-                except KeyError:
-                    try:
-                        color = __colorPalette.pop(0)
-                    except IndexError:
-                        __colorPalette = _colorPalette.copy()
-                        color = __colorPalette.pop(0)
-                    __colorCache[_key] = color
-                    return color
 
             labels = []
             values = []
@@ -120,9 +102,9 @@ class _Positions:
                         try:
                             group = groups[typ]
                         except KeyError:
-                            color = get_color(c_id)
+                            color = rc.get_position_color(c_id)
                             asset = Asset(c_id, color)
-                            color = get_color(typ)
+                            color = rc.get_position_color(typ)
                             group = Group(typ, color)
                             groups[typ] = group
                             asset.add(opn)
@@ -131,7 +113,7 @@ class _Positions:
                             try:
                                 asset = group.assets[c_id]
                             except KeyError:
-                                color = get_color(c_id)
+                                color = rc.get_position_color(c_id)
                                 asset = Asset(c_id, color)
                                 asset.add(opn)
                                 group.add(asset)
@@ -192,7 +174,7 @@ class _Positions:
                         try:
                             asset = assets[c_id]
                         except KeyError:
-                            color = get_color(c_id)
+                            color = rc.get_position_color(c_id)
                             asset = Asset(c_id, color)
                             assets[c_id] = asset
 

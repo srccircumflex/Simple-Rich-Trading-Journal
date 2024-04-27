@@ -25,7 +25,7 @@ def init():
             INIT_DATA = pickle.load(__f)
     except FileNotFoundError:
         INIT_DATA = __firstrun
-        dump(INIT_DATA)
+        dump_log(INIT_DATA)
     try:
         with open(CACHE_TRADINGLOG_HISTORY, "rb") as __f:
             HISTORY_DATA = pickle.load(__f)
@@ -46,7 +46,7 @@ def init():
             pickle.dump(HISTORY_DATA, __f, PICKLE_PROTOCOL)
 
     if do_dump:
-        dump(INIT_DATA)
+        dump_log(INIT_DATA)
         make_history()
         print(f"[HISTORY]++ (init -> do_dump)")
     elif make_hist:
@@ -76,6 +76,6 @@ def init():
     LAST_HISTORY_CREATION_TIME = HISTORY_DATA[HISTORY_KEYS_X_TIME_REVSORT[0][0]]["time"]
 
 
-def dump(data: list[dict]):
+def dump_log(data: list[dict]):
     with open(CACHE_TRADINGLOG, "wb") as __f:
         pickle.dump(data, __f, PICKLE_PROTOCOL)

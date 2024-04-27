@@ -598,6 +598,10 @@ class LogCalc:
 
         return self.do(row, ea_deposits, ea_payouts, ea_fin_trades, ea_open_trades, ea_undefined, ea_dividends, ea_itcs)
 
+    def get(self, __id: int) -> Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen:
+        _log = self._deposits + self._payouts + self._fin_trades + self._open_trades + self._dividends + self._itcs + self._undefined
+        return _log[_log.index({"id": __id})]
+
     def add(self, row: dict | _LogRecord) -> Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen:
         def ea_deposits(__o, __i): (__i._deposits.append(__o), __i._deposits.sort())
 
@@ -820,37 +824,39 @@ class LogCalc:
                             upd_row[amount_specs[i][0]] = getattr(upd_row[i], amount_specs[i][1])(N)
                             break
 
-        old_row = self.cat(old_row)
-        new_row = self.cat(upd_row)
-
-        self.replace(new_row, old_row)
-
         if not relevant_summary:
+            row = self.get(upd_row["id"])
+            row.row_dat.update(upd_row)
             ei = self.EditItem(
-                updates=[new_row.data],
+                updates=[row.row_dat],
                 added=[],
                 summary_relevant=False,
-                id_relevant=relevant_id,
-            )
-        elif not ((new_nin_calc := type(new_row) is _LogRecord) and type(old_row) is _LogRecord):
-            added = list(i.data for i in self.__f_calc__())
-            self.__reset_props__()
-            updates = list(i.data for i in self.calc_deposits + self.calc_payouts + self.fin_trades + self.open_trades + self.dividends + self.itcs)
-            if new_nin_calc:
-                updates.append(new_row.data)
-            ei = self.EditItem(
-                updates=updates,
-                added=added,
-                summary_relevant=True,
                 id_relevant=relevant_id,
             )
         else:
-            ei = self.EditItem(
-                updates=[new_row.data],
-                added=[],
-                summary_relevant=False,
-                id_relevant=relevant_id,
-            )
+            old_row = self.cat(old_row)
+            new_row = self.cat(upd_row)
+            self.replace(new_row, old_row)
+
+            if not ((new_nin_calc := type(new_row) is _LogRecord) and type(old_row) is _LogRecord):
+                added = list(i.data for i in self.__f_calc__())
+                self.__reset_props__()
+                updates = list(i.data for i in self.calc_deposits + self.calc_payouts + self.fin_trades + self.open_trades + self.dividends + self.itcs)
+                if new_nin_calc:
+                    updates.append(new_row.data)
+                ei = self.EditItem(
+                    updates=updates,
+                    added=added,
+                    summary_relevant=True,
+                    id_relevant=relevant_id,
+                )
+            else:
+                ei = self.EditItem(
+                    updates=[new_row.data],
+                    added=[],
+                    summary_relevant=False,
+                    id_relevant=relevant_id,
+                )
 
         return ei
 

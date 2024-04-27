@@ -1,6 +1,9 @@
+import pickle
+
 from rconfig import *
-from src import ROOT
+from src import ROOT, CACHE_COLORS
 from src.config import color_theme
+from src.config.styles.figures import color_palette_donut
 
 
 with open(ROOT + "/assets/rc.js", "w") as f:
@@ -46,3 +49,34 @@ else:
     c1Width = "100%"
     sideInitBalanceValue = 0
     sideInitStatisticValue = 0
+
+_colorCache = dict()
+if statisticsUsePositionColorCache:
+    def _dump_color_cache():
+        with open(CACHE_COLORS, "wb") as __f:
+            pickle.dump(_colorCache, __f)
+    try:
+        with open(CACHE_COLORS, "rb") as __f:
+            _colorCache = pickle.load(__f)
+    except FileNotFoundError:
+        _dump_color_cache()
+else:
+    def _dump_color_cache():
+        pass
+
+_colorPalette = color_palette_donut.copy()
+
+
+def get_position_color(__key):
+    global _colorPalette
+    try:
+        return _colorCache[__key]
+    except KeyError:
+        try:
+            color = _colorPalette.pop(0)
+        except IndexError:
+            _colorPalette = color_palette_donut.copy()
+            color = _colorPalette.pop(0)
+        _colorCache[__key] = color
+        _dump_color_cache()
+        return color
