@@ -160,6 +160,7 @@ cython_debug/
 .idea/
 
 src/cache/*.pkl
-src/cache/~cache
+src/cache/~cache/
 demo/*.pkl
 prconfig.py
+.notes/
