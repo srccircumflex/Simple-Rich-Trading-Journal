@@ -226,7 +226,7 @@ Nice to know
     Currently, the following error may occur temporarily, which leads to the copy function being blocked:
     ``Uncaught (in promise) DOMException: Clipboard write was blocked due to lack of user activation.``
 
-The feature can be disabled in |rconfig.py#L|_.
+    The feature can be disabled in :html:`<a href="./rconfig.py#L111">rconfig.py</a>`.
 
 - Confirm an entry in *InvestAmount* or *TakeAmount* with Enter, **not with Tap** (BUG).
 
@@ -277,5 +277,3 @@ The feature can be disabled in |rconfig.py#L|_.
 .. _rconfig.py: ./rconfig.py
 .. _plugin.init_log: ./plugin/__init__.py#L22
 .. _plugin/__init__.py: ./plugin/__init__.py
-.. |rconfig.py#L| replace:: rconfig.py
-.. _rconfig.py#L: ./rconfig.py#L111
