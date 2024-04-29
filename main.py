@@ -5,17 +5,16 @@ try:
 except Exception:
     raise
 
+from __version__ import __project_name__
+
 from dash import Dash
 from src import DASH_ASSETS, layout
 
 
-PROJECT = "Simple Rich Trading Protocol"
-
-
 def run():
     app = Dash(
-        PROJECT,
-        title=PROJECT,
+        __project_name__,
+        title=__project_name__,
         update_title="working...",
         assets_folder=DASH_ASSETS
     )

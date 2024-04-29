@@ -282,10 +282,4 @@ window.dash_clientside.clientside = {
         )
         return window.dash_clientside.no_update
     },
-    make: function (_) {
-        window.dash_clientside.clientside.make_wingrid();
-        window.dash_clientside.clientside.make_draggable();
-        window.dash_clientside.clientside.make_copypaste();
-        return window.dash_clientside.no_update
-    }
 }

@@ -5,10 +5,9 @@
   color: #e3e3e3 !important;
 }
 /* < agGrid Input color */
-        
+
 /* dataTable hover bg > */
 .dt-table-container__row-1 .cell-table tbody tr:hover td {
   background-color: rgb(218, 230, 247) !important;
 }
 /* < dataTable hover bg */
-        

@@ -41,7 +41,7 @@ def datetime_from_tradetimeformat(spec: str, default=None):
         return default
 
 
-def add_top_row(table_data: list[dict]):
+def do_add_row(table_data: list[dict]) -> bool:
     try:
         row0 = table_data[0]
     except IndexError:
@@ -55,7 +55,7 @@ def add_top_row(table_data: list[dict]):
             return True
 
 
-def durationformat(duration: float):
+def durationformat(duration: float) -> str:
     duration = int(duration)
     y = str((duration // 31557600) or "")
     duration = (duration % 31557600)

@@ -9,6 +9,9 @@ from src.calc.utils import datetime_from_tradetimeformat, tradetimeparser, preve
 from src.config.functional import record_tags
 
 
+manual_take_amount = False
+
+
 class _LogRecord:
     cat_id: str = ""
 
@@ -279,7 +282,7 @@ class TradeOpen(_Trade):
     def __init__(self, row_dat: dict, index_date: datetime, amount: float | None, default_date: datetime, has_take: bool):
         _Trade.__init__(self, row_dat, index_date, amount, default_date)
         self.has_take = has_take
-        if plugin.course_call(self.row_dat):
+        if plugin.course_call(self.row_dat, manual_take_amount):
             self.has_take = self.row_dat.get("TakeAmount") is not None
         if self.has_take:
             self.make_data()
@@ -288,7 +291,7 @@ class TradeOpen(_Trade):
         return self.__class__(self.row_dat.copy(), self._idx_date, self.amount, self.default_date, self.has_take)
 
     def update_course(self) -> TradeOpen:
-        if plugin.course_call(self.row_dat):
+        if plugin.course_call(self.row_dat, False):
             self.has_take = self.row_dat.get("TakeCourse") is not None
             self.make_data()
         return self
@@ -302,6 +305,10 @@ class TradeOpen(_Trade):
             self["Profit/Day"] = self["Profit"] / self["RoundedHoldDays"]
             self["Performance/Day"] = self["Performance"] / self["RoundedHoldDays"]
         return self.row_dat
+
+
+class _CmdTradeClose(_LogRecord):
+    ...
 
 
 class Dividend(_LogRecord):
@@ -449,7 +456,7 @@ class LogCalc:
             ea_dividends: Callable[[Dividend, LogCalc], Any] = lambda __o, __i: None,
             ea_itcs: Callable[[Itc, LogCalc], Any] = lambda __o, __i: None,
     ):
-        if type(row) is _LogRecord:
+        if type(row) in (_LogRecord, _CmdTradeClose):
             ea_undefined(row, self)
         elif isinstance(row, TradeOpen):
             ea_open_trades(row, self)
@@ -478,15 +485,16 @@ class LogCalc:
             ea_undefined: Callable[[_LogRecord, LogCalc], Any] = lambda __o, __i: None,
             ea_dividends: Callable[[Dividend, LogCalc], Any] = lambda __o, __i: None,
             ea_itcs: Callable[[Itc, LogCalc], Any] = lambda __o, __i: None,
-    ) -> Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen:
+    ) -> Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen | _CmdTradeClose:
         invest_t = datetime_from_tradetimeformat(row.get("InvestTime"))
         take_t = datetime_from_tradetimeformat(row.get("TakeTime"))
         invest_a = row.get("InvestAmount")
         take_a = row.get("TakeAmount")
         itc = row.get("ITC")
+        n = row.get("n")
         default_date = datetime.now()
         # deposit / payout / dividend / itc
-        if row.get("n") == 0:
+        if n == 0:
             if invest_t:
                 if invest_a:
                     # deposit
@@ -522,42 +530,59 @@ class LogCalc:
             else:
                 obj = _LogRecord(row_dat=row, index_date=None, amount=None, default_date=default_date)
                 ea_undefined(obj, self)
-        # N is valid
-        elif (row.get("n") or 0) > 0:
-            # trade
-            if invest_t:
-                if invest_a:
-                    if take_a is not None:
-                        if take_t:
-                            obj = TradeFinalized(row_dat=row, index_date=(take_t if self._index_by_take_date else invest_t), amount=invest_a, default_date=default_date)
-                            ea_fin_trades(obj, self)
+        # trade
+        elif n is not None:
+            if n > 0:
+                # trade
+                if invest_t:
+                    if invest_a:
+                        if take_a is not None:
+                            if take_t:
+                                obj = TradeFinalized(row_dat=row, index_date=(take_t if self._index_by_take_date else invest_t), amount=invest_a, default_date=default_date)
+                                ea_fin_trades(obj, self)
+                            else:
+                                obj = TradeOpen(row_dat=row, index_date=invest_t, amount=invest_a, default_date=default_date, has_take=True)
+                                ea_open_trades(obj, self)
                         else:
-                            obj = TradeOpen(row_dat=row, index_date=invest_t, amount=invest_a, default_date=default_date, has_take=True)
+                            obj = TradeOpen(row_dat=row, index_date=invest_t, amount=invest_a, default_date=default_date, has_take=False)
                             ea_open_trades(obj, self)
                     else:
-                        obj = TradeOpen(row_dat=row, index_date=invest_t, amount=invest_a, default_date=default_date, has_take=False)
-                        ea_open_trades(obj, self)
-                else:
-                    # invalid record with date
-                    obj = _LogRecord(row_dat=row, index_date=invest_t, amount=None, default_date=default_date)
+                        # invalid record with date
+                        obj = _LogRecord(row_dat=row, index_date=invest_t, amount=None, default_date=default_date)
+                        ea_undefined(obj, self)
+                # invalid record with date
+                elif take_t:
+                    obj = _LogRecord(row_dat=row, index_date=take_t, amount=None, default_date=default_date)
                     ea_undefined(obj, self)
-            # invalid record with date
-            elif take_t:
-                obj = _LogRecord(row_dat=row, index_date=take_t, amount=None, default_date=default_date)
-                ea_undefined(obj, self)
-            # invalid record without date
+                # invalid record without date
+                else:
+                    obj = _LogRecord(row_dat=row, index_date=None, amount=None, default_date=default_date)
+                    ea_undefined(obj, self)
             else:
-                obj = _LogRecord(row_dat=row, index_date=None, amount=None, default_date=default_date)
-                ea_undefined(obj, self)
-        # N is invalid with date
+                # trade close
+                if take_t:
+                    if take_a is not None:
+                        obj = _CmdTradeClose(row_dat=row, index_date=take_t, amount=take_a, default_date=default_date)
+                    else:
+                        obj = _LogRecord(row_dat=row, index_date=take_t, amount=None, default_date=default_date)
+                    ea_undefined(obj, self)
+                # invalid record with date
+                elif invest_t:
+                    obj = _LogRecord(row_dat=row, index_date=take_t, amount=None, default_date=default_date)
+                    ea_undefined(obj, self)
+                # invalid record without date
+                else:
+                    obj = _LogRecord(row_dat=row, index_date=None, amount=None, default_date=default_date)
+                    ea_undefined(obj, self)
+        # n is undefined with date
         elif invest_t:
             obj = _LogRecord(row_dat=row, index_date=invest_t, amount=None, default_date=default_date)
             ea_undefined(obj, self)
-        # N is invalid with date
+        # n is undefined with date
         elif take_t:
             obj = _LogRecord(row_dat=row, index_date=take_t, amount=None, default_date=default_date)
             ea_undefined(obj, self)
-        # N is invalid without date
+        # n is undefined without date
         else:
             obj = _LogRecord(row_dat=row, index_date=None, amount=None, default_date=default_date)
             ea_undefined(obj, self)
@@ -619,11 +644,11 @@ class LogCalc:
 
         return self.do(row, ea_deposits, ea_payouts, ea_fin_trades, ea_open_trades, ea_undefined, ea_dividends, ea_itcs)
 
-    def replace(self, new_row: _LogRecord | dict, old_row: _LogRecord | dict | None) -> tuple[Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen, Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen | None]:
+    def replace(self, old_row: _LogRecord | dict | None, new_row: _LogRecord | dict) -> tuple[Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen, Payout | Dividend | Itc | _LogRecord | Deposit | TradeFinalized | TradeOpen | None]:
         if old_row:
             old_row = self.rm(old_row)
         new_row = self.add(new_row)
-        return new_row, old_row
+        return old_row, new_row
 
     def new_row(self) -> _LogRecord:
         new = {"id": len(self)}
@@ -682,7 +707,7 @@ class LogCalc:
 
         self.new_row()
 
-        for n, o in enumerate(self.__get_log_objs__()):
+        for n, o in enumerate(self.__get_sorted_log_objs__()):
             o["id"] = n
 
         self.__f_reset_calc__()
@@ -733,7 +758,7 @@ class LogCalc:
                     _new = self.new_row()
                     new = _new.row_dat | {"n": 0, "TakeTime": row["TakeTime"], "ITC": remain_payout_value}
                     new = Itc(new, datetime_from_tradetimeformat(row["TakeTime"]), remain_payout_value, datetime.now())
-                    self.replace(new, _new)
+                    self.replace(_new, new)
                     added_rows.append(new)
                     added_rows += self.__f_calc__()
                     break
@@ -778,97 +803,181 @@ class LogCalc:
         added: list
         summary_relevant: bool
         id_relevant: bool
+        same_type: bool
 
-    def edit(self, update: dict) -> LogCalc.EditItem:
+    def edit(self, update: dict) -> EditItem:
+        global manual_take_amount
+        try:
+            relevant_summary = True
+            relevant_id = False
 
-        relevant_summary = True
-        relevant_id = False
+            invest_amount_specs = {
+                "InvestAmount": ("InvestCourse", "__truediv__"),
+                "InvestCourse": ("InvestAmount", "__mul__"),
+            }
+            take_amount_specs = {
+                "TakeAmount": ("TakeCourse", "__truediv__"),
+                "TakeCourse": ("TakeAmount", "__mul__"),
+            }
 
-        amount_specs = {
-            "InvestAmount": ("InvestCourse", "__truediv__"),
-            "InvestCourse": ("InvestAmount", "__mul__"),
-            "TakeAmount": ("TakeCourse", "__truediv__"),
-            "TakeCourse": ("TakeAmount", "__mul__"),
-        }
-
-        upd_row = update["data"]
-        triggered_col = update["colId"]
-        old_row = upd_row | {triggered_col: update.get("oldValue")}
-
-        if triggered_col == "Note":
-            relevant_summary = False
-        elif triggered_col == "Name":
-            plugin.symbol_call(update)
             upd_row = update["data"]
-            relevant_summary = upd_row.get("n") == 0
-            relevant_id = True
-        elif triggered_col == "Symbol":
-            plugin.symbol_call(update)
-            upd_row = update["data"]
-            relevant_summary = False
-            relevant_id = True
-        elif triggered_col == "Type":
-            plugin.symbol_call(update)
-            upd_row = update["data"]
-            relevant_summary = False
-            relevant_id = True
-        elif update.get("value") is None:  # cell delete
-            for i in amount_specs:
-                if triggered_col == i:
-                    upd_row.pop(amount_specs[i][0], None)
-                    break
-        else:
-            if triggered_col in ("InvestTime", "TakeTime"):
-                upd_row[update["colId"]] = tradetimeparser(update["value"])
-            else:
-                if N := upd_row.get("n"):
-                    for i in amount_specs:
+            triggered_col = update["colId"]
+            old_row = upd_row | {triggered_col: update.get("oldValue")}
+
+            if triggered_col == "Note":
+                relevant_summary = False
+            elif triggered_col == "Name":
+                plugin.symbol_call(update)
+                upd_row = update["data"]
+                relevant_summary = upd_row.get("n") == 0
+                relevant_id = True
+            elif triggered_col == "Symbol":
+                plugin.symbol_call(update)
+                upd_row = update["data"]
+                relevant_summary = False
+                relevant_id = True
+            elif triggered_col == "Type":
+                plugin.symbol_call(update)
+                upd_row = update["data"]
+                relevant_summary = False
+                relevant_id = True
+            elif update.get("value") is None:  # cell delete
+                for i in invest_amount_specs:
+                    if triggered_col == i:
+                        upd_row.pop(invest_amount_specs[i][0], None)
+                        break
+                else:
+                    for i in take_amount_specs:
                         if triggered_col == i:
-                            upd_row[amount_specs[i][0]] = getattr(upd_row[i], amount_specs[i][1])(N)
+                            upd_row.pop(take_amount_specs[i][0], None)
+                            manual_take_amount = True
                             break
-
-        if not relevant_summary:
-            row = self.get(upd_row["id"])
-            row.row_dat.update(upd_row)
-            ei = self.EditItem(
-                updates=[row.row_dat],
-                added=[],
-                summary_relevant=False,
-                id_relevant=relevant_id,
-            )
-        else:
-            old_row = self.cat(old_row)
-            new_row = self.cat(upd_row)
-            self.replace(new_row, old_row)
-
-            if not ((new_nin_calc := type(new_row) is _LogRecord) and type(old_row) is _LogRecord):
-                added = list(i.data for i in self.__f_calc__())
-                self.__reset_props__()
-                updates = list(i.data for i in self.calc_deposits + self.calc_payouts + self.fin_trades + self.open_trades + self.dividends + self.itcs)
-                if new_nin_calc:
-                    updates.append(new_row.data)
-                ei = self.EditItem(
-                    updates=updates,
-                    added=added,
-                    summary_relevant=True,
-                    id_relevant=relevant_id,
-                )
             else:
+                if triggered_col in ("InvestTime", "TakeTime"):
+                    upd_row[update["colId"]] = tradetimeparser(update["value"])
+                else:
+                    if N := upd_row.get("n"):
+                        for i in invest_amount_specs:
+                            if triggered_col == i:
+                                upd_row[invest_amount_specs[i][0]] = getattr(upd_row[i], invest_amount_specs[i][1])(N)
+                                break
+                        else:
+                            for i in take_amount_specs:
+                                if triggered_col == i:
+                                    upd_row[take_amount_specs[i][0]] = getattr(upd_row[i], take_amount_specs[i][1])(N)
+                                    manual_take_amount = True
+                                    break
+
+            new_row = self.cat(upd_row)
+            if isinstance(new_row, _CmdTradeClose):
+                return self.close_trade(new_row)
+            elif not relevant_summary:
+                row = self.get(upd_row["id"])
+                row.row_dat.update(upd_row)
                 ei = self.EditItem(
-                    updates=[new_row.data],
+                    updates=[row.row_dat],
                     added=[],
                     summary_relevant=False,
                     id_relevant=relevant_id,
+                    same_type=False
                 )
+            else:
+                old_row = self.cat(old_row)
+                self.replace(old_row, new_row)
+                t_new = type(new_row)
+                t_old = type(old_row)
+                if not ((new_nin_calc := t_new is _LogRecord) and t_old is _LogRecord):
+                    added = list(i.data for i in self.__f_calc__())
+                    self.__reset_props__()
+                    updates = list(i.data for i in self.calc_deposits + self.calc_payouts + self.fin_trades + self.open_trades + self.dividends + self.itcs)
+                    if new_nin_calc:
+                        updates.append(new_row.data)
+                    ei = self.EditItem(
+                        updates=updates,
+                        added=added,
+                        summary_relevant=True,
+                        id_relevant=relevant_id,
+                        same_type=t_old is t_new
+                    )
+                else:
+                    ei = self.EditItem(
+                        updates=[new_row.data],
+                        added=[],
+                        summary_relevant=False,
+                        id_relevant=relevant_id,
+                        same_type=t_old is t_new
+                    )
+
+            return ei
+        finally:
+            manual_take_amount = False
+
+    def close_trade(self, row: _CmdTradeClose) -> EditItem:
+        open_trades = sorted(self.open_trades)
+        close_name = row["Name"]
+        close_t = row["TakeTime"]
+        close_n = abs(row["n"])
+        row["TakeAmount"] = abs(row["TakeAmount"])
+        close_c = row["TakeAmount"] / close_n
+        row["TakeCourse"] = close_c
+        updates = list()
+        for ot in open_trades:
+            if ot["Name"] == close_name:
+                _close_n = close_n - ot["n"]
+                if _close_n < 0:
+                    ot["n"] = abs(_close_n)
+                    ot["InvestAmount"] = ot["InvestCourse"] * ot["n"]
+                    if ot.row_dat.get("TakeCourse") is not None:
+                        ot["TakeAmount"] = ot["TakeCourse"] * ot["n"]
+
+                    row["n"] = close_n
+                    row["InvestTime"] = ot["InvestTime"]
+                    row["InvestAmount"] = ot["InvestCourse"] * close_n
+                    row["TakeAmount"] = close_c * close_n
+                    row["TakeCourse"] = close_c
+
+                    self.replace(row, row.row_dat)
+                    break
+                else:
+                    ot["TakeTime"] = close_t
+                    ot["TakeCourse"] = close_c
+                    ot["TakeAmount"] = close_c * ot["n"]
+                    self.replace(ot, ot.row_dat)
+                    if _close_n == 0:
+                        row.row_dat = {"id": row["id"], "cat": row["cat"]}
+                        self.replace(row, row.row_dat)
+                        updates.append(row.row_dat)
+                        break
+                    close_n = _close_n
+        else:
+            row["n"] = None
+            row["Name"] = f"# (-{close_n})? {row['Name']}"
+            self.replace(row, row.row_dat)
+            updates.append(row.row_dat)
+
+        added = list(i.data for i in self.__f_calc__())
+        self.__reset_props__()
+        updates += list(i.data for i in self.calc_deposits + self.calc_payouts + self.fin_trades + self.open_trades + self.dividends + self.itcs)
+        ei = self.EditItem(
+            updates=updates,
+            added=added,
+            summary_relevant=True,
+            id_relevant=False,
+            same_type=False
+        )
 
         return ei
 
-    def update(self, new_row: dict, old_row: dict | None):
+    def update(self, new_row: dict, old_row: dict | None) -> EditItem:
+        new_row = self.cat(new_row)
+        if isinstance(new_row, _CmdTradeClose):
+            return self.close_trade(new_row)
         if old_row:
             old_row = self.cat(old_row)
-        new_row = self.cat(new_row)
-        self.replace(new_row, old_row)
-        if not ((new_nin_calc := type(new_row) is _LogRecord) and type(old_row) is _LogRecord):
+        self.replace(old_row, new_row)
+        t_new = type(new_row)
+        t_old = type(old_row)
+        if not ((new_nin_calc := t_new is _LogRecord) and t_old is _LogRecord):
             added = list(i.data for i in self.__f_calc__())
             self.__reset_props__()
             updates = list(i.data for i in self.calc_deposits + self.calc_payouts + self.fin_trades + self.open_trades + self.dividends + self.itcs)
@@ -879,6 +988,7 @@ class LogCalc:
                 added=added,
                 summary_relevant=True,
                 id_relevant=True,
+                same_type=t_old is t_new
             )
         else:
             ei = self.EditItem(
@@ -886,12 +996,13 @@ class LogCalc:
                 added=[],
                 summary_relevant=False,
                 id_relevant=True,
+                same_type=t_old is t_new
             )
 
         return ei
 
     def update_course(self) -> list[dict]:
-        return [self.replace(ot.update_course(), ot)[0].data for ot in self.open_trades]
+        return [self.replace(ot, ot.update_course())[1].data for ot in self.open_trades]
 
     def getTradeFrame(
             self,
@@ -904,59 +1015,68 @@ class LogCalc:
 
     ##########################################################################################################################################
 
-    @property
-    def calc_deposits(self) -> list[Deposit]:
+    @cached_property
+    def calc_deposits(self) -> tuple[Deposit, ...]:
         self.__x_init_data__()
-        return self._deposits
+        return tuple(self._deposits)
 
-    frame_deposits = calc_deposits
-    
-    @property
-    def calc_payouts(self) -> list[Payout]:
-        self.__x_init_data__()
-        return self._payouts
-
-    frame_payouts = calc_payouts
+    @cached_property
+    def frame_deposits(self) -> tuple[Deposit, ...]: return self.calc_deposits
     
     @cached_property
-    def calc_trades(self) -> list[TradeFinalized | TradeOpen]:
+    def calc_payouts(self) -> tuple[Payout, ...]:
+        self.__x_init_data__()
+        return tuple(self._payouts)
+
+    @cached_property
+    def frame_payouts(self) -> tuple[Payout, ...]: return self.calc_payouts
+    
+    @cached_property
+    def calc_trades(self) -> tuple[TradeFinalized | TradeOpen, ...]:
         self.__x_init_data__()
         if self._calc_with_open_positions:
-            return [t for t in sorted(self._open_trades + self._fin_trades) if t.has_take]
+            return tuple(t for t in sorted(self._open_trades + self._fin_trades) if t.has_take)
         else:
-            return self._fin_trades
+            return self.fin_trades
 
-    @property
-    def fin_trades(self) -> list[TradeFinalized]:
+    @cached_property
+    def fin_trades(self) -> tuple[TradeFinalized, ...]:
         self.__x_init_data__()
-        return self._fin_trades
+        return tuple(self._fin_trades)
 
-    @property
-    def open_trades(self) -> list[TradeOpen]:
+    @cached_property
+    def open_trades(self) -> tuple[TradeOpen, ...]:
         self.__x_init_data__()
-        return self._open_trades
+        return tuple(self._open_trades)
 
-    @property
-    def undefined(self) -> list[_LogRecord]:
+    @cached_property
+    def undefined(self) -> tuple[_LogRecord, ...]:
         self.__x_init_data__()
-        return self._undefined
+        return tuple(self._undefined)
 
-    @property
-    def dividends(self) -> list[Dividend]:
+    @cached_property
+    def dividends(self) -> tuple[Dividend, ...]:
         self.__x_init_data__()
-        return self._dividends
+        return tuple(self._dividends)
 
-    @property
-    def itcs(self) -> list[Itc]:
+    @cached_property
+    def itcs(self) -> tuple[Itc, ...]:
         self.__x_init_data__()
-        return self._itcs
+        return tuple(self._itcs)
 
     def __get_log_objs__(self):
         self.__x_init_data__()
-        return sorted(self._deposits + self._payouts + self._fin_trades + self._open_trades + self._dividends + self._itcs + self._undefined, key=lambda o: o.index_date, reverse=True)
+        return self._deposits + self._payouts + self._fin_trades + self._open_trades + self._dividends + self._itcs + self._undefined
+
+    def __get_sorted_log_objs__(self):
+        self.__x_init_data__()
+        return sorted(self.__get_log_objs__(), key=lambda o: o.index_date, reverse=True)
 
     def __get_log_json__(self):
         return [o.data for o in self.__get_log_objs__()]
+
+    def __get_sorted_log_json__(self):
+        return [o.data for o in self.__get_sorted_log_objs__()]
 
     ##########################################################################################################################################
 
@@ -1221,8 +1341,6 @@ class TradeFrameCalc(LogCalc):
                 if stop(records[i]):
                     filtered = records[:i]
                     break
-            else:
-                filtered = filtered.copy()
             return [i.copy() for i in filtered]
 
         self._deposits = _filter_ios(self.__mainFrame__.calc_deposits)
@@ -1266,9 +1384,9 @@ class TradeFrameCalc(LogCalc):
         self._init()
 
     @cached_property
-    def openings(self) -> list[TradeOpen | TradeFinalized]:
+    def openings(self) -> tuple[TradeOpen | TradeFinalized, ...] | tuple:
         openings = list()
-        trades = self.fin_trades + self.open_trades
+        trades = list(self.fin_trades + self.open_trades)
         trades.sort(key=lambda x: x._min_date)
         try:
             for i in range(len(trades)):
@@ -1284,12 +1402,12 @@ class TradeFrameCalc(LogCalc):
                     break
         except IndexError:
             pass
-        return openings
+        return tuple(openings)
 
     @cached_property
-    def closures(self) -> list[TradeOpen | TradeFinalized]:
+    def closures(self) -> tuple[TradeOpen | TradeFinalized, ...] | tuple:
         closures = list()
-        trades = self.fin_trades
+        trades = list(self.fin_trades)
         trades.sort(key=lambda x: x._max_date)
         try:
             for i in range(len(trades)):
@@ -1305,23 +1423,23 @@ class TradeFrameCalc(LogCalc):
                     break
         except IndexError:
             pass
-        return closures
+        return tuple(closures)
 
     @cached_property
-    def frame_deposits(self) -> list[Deposit] | list:
+    def frame_deposits(self) -> tuple[Deposit, ...] | tuple:
         for i in range(len(self.__mainFrame__.calc_deposits)):
             if self.frame_begin <= self.__mainFrame__.calc_deposits[i].index_date:
                 return self.__mainFrame__.calc_deposits[i:]
         else:
-            return list()
+            return tuple()
 
     @cached_property
-    def frame_payouts(self) -> list[Payout] | list:
+    def frame_payouts(self) -> tuple[Payout, ...] | tuple:
         for i in range(len(self.__mainFrame__.calc_payouts)):
             if self.frame_begin <= self.__mainFrame__.calc_payouts[i].index_date:
                 return self.__mainFrame__.calc_payouts[i:]
         else:
-            return list()
+            return tuple()
 
     @cached_property
     def n_openings(self) -> int:

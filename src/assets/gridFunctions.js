@@ -110,3 +110,25 @@ dagfuncs.timedeltaFormatter = (cellValue) => {
 
     return timedeltaString;
 };
+
+
+dagfuncs.calc = (cellValue) => {
+
+    const npat = /[^-+*/%&|^\d\(\),. ]/;
+    const swgr = /\d\,\d+[\D$]/;
+
+    value = cellValue.replaceAll(" ", "");
+
+    if (!value || value.match(npat)) {
+      return null;
+    } else if (value.includes(",") && value.includes(".")) {
+        if (value.match(swgr)) {
+            value = value.replaceAll(".", "");
+            value = value.replaceAll(",", ".");
+        }
+        return eval(value);
+    } else {
+        value = value.replaceAll(",", ".");
+        return eval(value);
+    }
+};

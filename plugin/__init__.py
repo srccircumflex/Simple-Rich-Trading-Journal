@@ -8,9 +8,9 @@ def symbol_call(update_object: dict) -> None:
     return
 
 
-def course_call(row_record: dict) -> bool:
+def course_call(row_record: dict, manual_take_amount: bool) -> bool:
     # Is called if a record falls into the `Open Trade` category.
-    # Receives the <row record> (see below).
+    # Receives the <row record> (see below) and `manual_take_amount` indicates whether the amount was entered manually.
     # The return value indicates whether something has been changed.
     # If something is changed, the <row record> must be edited in place, e.g.:
     #   >>> row_record["TakeCourse"] = your_api(row_record["Symbol"])

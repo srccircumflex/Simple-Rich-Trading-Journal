@@ -167,7 +167,7 @@ daterange = dcc.DatePickerRange(
 )
 index_by_button = html.Button(
     "Index by ...",
-    n_clicks=rc.indexByTaketime,
+    n_clicks=rc.indexByTakeTime,
     id="index_by_button_",
     style={
         "display": "inline-block",

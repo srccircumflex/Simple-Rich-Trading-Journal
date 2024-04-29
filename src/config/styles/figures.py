@@ -1,7 +1,4 @@
 from src.config import color_theme, rc
-from plotly.colors import qualitative
-
-color_palette_donut = qualitative.D3 + qualitative.G10 + qualitative.T10
 
 
 size_open_positions = rc.statisticsOpenPositionsGraphSize

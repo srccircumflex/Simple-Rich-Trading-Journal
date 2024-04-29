@@ -1,3 +1,8 @@
+from plotly.colors import qualitative
+
+color_palette_donut = qualitative.D3 + qualitative.G10 + qualitative.T10
+
+
 #####################################################
 # https://dash.plotly.com/dash-ag-grid/styling-themes
 table_theme = "ag-theme-balham-auto-dark"
@@ -48,10 +53,12 @@ figure_font = "#dedddc"
 figure_grid = "#394446"
 figure_spike = "white"
 
-# main/statistics/figure/traces
-trace_total_profit = "#636efa"
+# /statistics/figure/traces
+trace_profit = "#636efa"
+trace_summary = "#884dff"
 trace_current_performance = "#99ff33"
 trace_dripping_performance = "#339933"
+trace_summary_rate = "#00ff99"
 trace_deposit = "#ff97ff"
 trace_payout = "#ff3333"
 trace_money = "#ffa15a"
@@ -77,6 +84,10 @@ statistics_button_shadow = "rgba(0, 207, 255, 0.35)"
 balance_button_border = "rgb(0, 255, 207)"
 balance_button_shadow = "rgba(0, 255, 76, 0.35)"
 
+# /footer/life signal
+footer_sig1 = "#660066"
+footer_sig2 = "#999900"
+
 # /top bar
 top_onoff_bg = "#48b9c7"
 top_onoff_fg = "black"
@@ -95,3 +106,6 @@ sheet_header_current = "rgb(246, 221, 255)"
 sheet_cell_active_bg = "#cce0ff"
 sheet_cell_selected_bg = "#cce0ff"
 sheet_hover_bg = "rgb(218, 230, 247)"
+
+alt_neg = "rgb(200, 0, 200)"
+alt_pos = "rgb(200, 200, 0)"

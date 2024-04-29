@@ -2,10 +2,12 @@ from re import sub
 from sys import argv
 
 import plugin
-from src.config import rc
+import rconfig as rc
 import src
 
-from . import make
+from pathlib import Path
+
+from demo import make
 
 ID = ""
 ROOT = sub("[^/\\\\]+$", "", __file__)
@@ -14,6 +16,8 @@ _CACHE_TRADINGLOG = CACHE_ROOT + "/demo-%s-tradinglog.pickle"
 _CACHE_TRADINGLOG_HISTORY = CACHE_ROOT + "/demo-%s-tradinglog-history.pickle"
 CACHE_TRADINGLOG = _CACHE_TRADINGLOG
 CACHE_TRADINGLOG_HISTORY = _CACHE_TRADINGLOG_HISTORY
+
+DEMO_BU = CACHE_ROOT + "/~demo--tradinglog.pickle."
 
 
 def init(id_: str):
@@ -26,6 +30,11 @@ def init(id_: str):
     src.CACHE_ROOT = CACHE_ROOT
     src.CACHE_TRADINGLOG = CACHE_TRADINGLOG
     src.CACHE_TRADINGLOG_HISTORY = CACHE_TRADINGLOG_HISTORY
+
+    if not Path(CACHE_TRADINGLOG).exists():
+        with open(DEMO_BU, "rb") as _if:
+            with open(CACHE_TRADINGLOG, "wb") as _of:
+                _of.write(_if.read())
 
 
 _make = False
@@ -56,22 +65,27 @@ if _make:
 if _plugin:
 
     rc.coursePluginUpdateInterval = 1
+    rc.cellRendererChangeTakeCourse = 1
 
-    def course_call(row_data: dict) -> bool:
-        c = row_data["InvestCourse"]
-        if make.randint(0, 1):
-            c *= (1 + make.randrate2())
+    def course_call(row_data: dict, manual_take_amount: bool) -> bool:
+        if not manual_take_amount:
+            c = row_data.get("TakeCourse") or row_data["InvestCourse"]
+            if c:
+                if make.randint(0, 1):
+                    c *= (1 + make.randrate2())
+                else:
+                    c *= (1 - make.randrate2())
+                row_data["TakeCourse"] = c
+                row_data["TakeAmount"] = row_data["n"]
+                return True
         else:
-            c *= (1 - make.randrate2())
-        row_data["TakeCourse"] = c
-        row_data["TakeAmount"] = row_data["n"]
-        return True
+            return False
 
 
     plugin.course_call = course_call
 
     def symbol_call(update_data: dict) -> None:
-        if asset := make.example_assets.get(update_data["value"]):
+        if asset := make.example_assets.get(update_data.get("value")):
             update_data["data"] |= {"Symbol": asset[2], "Type": asset[1]}
 
     plugin.symbol_call = symbol_call

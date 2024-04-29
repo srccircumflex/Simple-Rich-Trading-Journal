@@ -13,8 +13,10 @@ from dash import callback_context
 
 from src import cache, layout
 from src.calc.log import LogCalc, TradeFrameCalc
-from src.calc.utils import add_top_row
+from src.calc.utils import do_add_row
 from src.config import styles, rc
+
+import plugin
 
 __lc__: LogCalc | TradeFrameCalc
 
@@ -52,11 +54,12 @@ def new_side(
         eval(i_performance_trailing_frame_value),
         eval(i_performance_trailing_interval_value),
         eval(i_performance_range_value),
+        rc.statisticsPerformanceOrder
     )
     if i_drag_event_receiver_value:
         drag_event_receiver_ = loads(i_drag_event_receiver_value)
         order = tuple(int(i.split("-")[1]) for i in drag_event_receiver_["target_children"])
-        order = tuple(order.index(i) + 1 for i in range(1, 8))
+        order = tuple(order.index(i) + 1 for i in range(1, rc.nStatisticsDrag + 1))
         layout.make.performance.OBJ.opt__order(order)
     o_drag_container_style = i_drag_container_style | {"height": "%dpx" % i_performance_size_slider_value}
     layout.make.balance.OBJ.new(__lc__, scope_by_attr, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_)
@@ -77,7 +80,7 @@ def new_side(
     Output(layout.tradinglog, "rowTransaction", allow_duplicate=True),
     Output(layout.summary_footer, "children", allow_duplicate=True),
     Output(layout.summary_footer, "style", allow_duplicate=True),
-    Output(layout.style_trigger, "n_clicks", allow_duplicate=True),
+    Output(layout.renderer_trigger, "n_clicks", allow_duplicate=True),
     Output(layout.statistics.open_positions_graph, "figure", allow_duplicate=True),
     Output(layout.statistics.all_positions_graph, "figure", allow_duplicate=True),
     Output(layout.statistics.performance_graph, "figure", allow_duplicate=True),
@@ -104,7 +107,7 @@ def new_side(
     Input(layout.header.daterange, "start_date"),
     Input(layout.header.daterange, "end_date"),
     Input(layout.header.with_open_trigger, "n_clicks"),
-    State(layout.style_trigger, "n_clicks"),
+    State(layout.renderer_trigger, "n_clicks"),
     Input(layout.header.auto_save_button, "n_clicks"),
     State(layout.header.auto_save_button, "style"),
     State(layout.statistics.open_positions_graph, "figure"),
@@ -149,7 +152,7 @@ def call(
         i_daterange_start_date,
         i_daterange_end_date,
         i_with_open_value,
-        i_style_trigger_n_clicks,
+        i_renderer_trigger_n_clicks,
         i_auto_save_n_clicks,
         i_auto_save_style,
         i_open_positions_graph_figure,
@@ -207,7 +210,7 @@ def call(
     o_tradinglog_rowTransaction = no_update
     o_summary_footer_children = no_update
     o_summary_footer_style = no_update
-    o_style_trigger_n_clicks = no_update
+    o_renderer_trigger_n_clicks = no_update
     o_open_positions_graph_figure = no_update
     o_all_positions_graph_figure = no_update
     o_performance_graph_figure = no_update
@@ -252,7 +255,7 @@ def call(
         # print((f"{o_tradinglog_rowTransaction          =}",))
         # print((f"{o_summary_footer_children            =}",))
         # print((f"{o_summary_footer_style               =}",))
-        # print((f"{o_style_trigger_n_clicks             =}",))
+        # print((f"{o_renderer_trigger_n_clicks             =}",))
         # print((f"{o_open_positions_graph_figure        =}",))
         # print((f"{o_all_positions_graph_figure         =}",))
         # print((f"{o_performance_graph_figure           =}",))
@@ -279,7 +282,7 @@ def call(
             o_tradinglog_rowTransaction,
             o_summary_footer_children,
             o_summary_footer_style,
-            o_style_trigger_n_clicks,
+            o_renderer_trigger_n_clicks,
             o_open_positions_graph_figure,
             o_all_positions_graph_figure,
             o_performance_graph_figure,
@@ -309,20 +312,20 @@ def call(
 
     def timeframe():
         global __lc__
-        nonlocal i_daterange_end_date, o_tradinglog_rowData, o_summary_footer_children, o_style_trigger_n_clicks
+        nonlocal i_daterange_end_date, o_tradinglog_rowData, o_summary_footer_children, o_renderer_trigger_n_clicks
         start = datetime.datetime.strptime(i_daterange_start_date, "%Y-%m-%d")
         if not i_daterange_end_date:
             end = datetime.datetime.now()
         else:
             end = datetime.datetime.strptime(i_daterange_end_date, "%Y-%m-%d") + datetime.timedelta(1)
         __lc__ = __lc__.getTradeFrame(start, end, by_attr=scope_by_attr, ui=True)
-        o_tradinglog_rowData = __lc__.__get_log_json__()
+        o_tradinglog_rowData = __lc__.__get_sorted_log_json__()
         o_summary_footer_children = layout.make.make_footer(__lc__)
-        o_style_trigger_n_clicks = i_style_trigger_n_clicks + 1
+        o_renderer_trigger_n_clicks = i_renderer_trigger_n_clicks + 1
 
     def new_table(row_data: list):
         global __lc__
-        nonlocal o_tradinglog_rowData, o_daterange_min_date_allowed, o_daterange_max_date_allowed, o_daterange_initial_visible_month, o_summary_footer_children, o_summary_footer_style, o_style_trigger_n_clicks
+        nonlocal o_tradinglog_rowData, o_daterange_min_date_allowed, o_daterange_max_date_allowed, o_daterange_initial_visible_month, o_summary_footer_children, o_summary_footer_style, o_renderer_trigger_n_clicks
 
         __lc__ = LogCalc(row_data)
         __lc__.set_parameter(i_index_by_button_n_clicks, i_with_open_value)
@@ -337,9 +340,9 @@ def call(
         if i_daterange_start_date:
             timeframe()
         else:
-            o_tradinglog_rowData = __lc__.__get_log_json__()
+            o_tradinglog_rowData = __lc__.__get_sorted_log_json__()
             o_summary_footer_children = layout.make.make_footer(__lc__)
-            o_style_trigger_n_clicks = i_style_trigger_n_clicks + 1
+            o_renderer_trigger_n_clicks = i_renderer_trigger_n_clicks + 1
 
     def save():
         if i_auto_save_n_clicks:
@@ -377,8 +380,18 @@ def call(
                 o_scope_by_button_style = i_scope_by_button_style | styles.misc.by_index_off
                 o_scope_by_button_children = "Scope\u2007by\u2007Both\u2007"
             cache.init()
-            o_backup_list_options = layout.make.make_history_list(cache.HISTORY_KEYS_X_TIME_REVSORT)
+            _course_call = plugin.course_call
+            course_call = plugin.course_call
+            if rc.startupFlushOpenTakeAmount:
+                def course_call(row, _):
+                    row.pop("TakeAmount", None)
+                    row.pop("TakeCourse", None)
+                    return True
+
+            plugin.course_call = course_call
             new_table(cache.INIT_DATA)
+            plugin.course_call = _course_call
+            o_backup_list_options = layout.make.make_history_list(cache.HISTORY_KEYS_X_TIME_REVSORT)
             o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
 
         # index by
@@ -394,9 +407,9 @@ def call(
                 o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
             elif not i_daterange_end_date:
                 __lc__ = __lc__.getMainFrame()
-                o_tradinglog_rowData = __lc__.__get_log_json__()
+                o_tradinglog_rowData = __lc__.__get_sorted_log_json__()
                 o_summary_footer_children = layout.make.make_footer(__lc__)
-                o_style_trigger_n_clicks = i_style_trigger_n_clicks + 1
+                o_renderer_trigger_n_clicks = i_renderer_trigger_n_clicks + 1
                 o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
 
         # scope by
@@ -420,13 +433,11 @@ def call(
 
             o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
             o_summary_footer_children = layout.make.make_footer(__lc__)
-            o_style_trigger_n_clicks = i_style_trigger_n_clicks + 1
 
         # auto save
         elif __trigger__ == layout.header.auto_save_button.id:
             set_auto_save(i_auto_save_n_clicks)
-            if o_auto_save_n_clicks:
-                cache.dump_log(i_tradinglog_rowData)
+            save()
 
         # load backup
         elif __trigger__ == layout.history.history_list.id:
@@ -439,17 +450,18 @@ def call(
         elif __trigger__ == layout.tradinglog.id:
             if i_tradinglog_cellValueChanged:
                 o_tradinglog_rowTransaction = dict()
-                add = list()
+                added = list()
                 edit_item = __lc__.edit(i_tradinglog_cellValueChanged[0])
                 if edit_item.added:
-                    add = edit_item.added
-                if add_top_row(i_tradinglog_rowData):
-                    add.append(__lc__.new_row().row_dat)
-                if add:
-                    o_tradinglog_rowTransaction = {"add": add, "addIndex": 0}
+                    added = edit_item.added
+                if do_add_row(i_tradinglog_rowData):
+                    added.append(__lc__.new_row().row_dat)
+                if added:
+                    o_tradinglog_rowTransaction = {"add": added, "addIndex": 0}
                 save()
                 o_tradinglog_rowTransaction |= {"update": edit_item.updates}
-                o_style_trigger_n_clicks = i_style_trigger_n_clicks + 1
+                if not edit_item.same_type:
+                    o_renderer_trigger_n_clicks = i_renderer_trigger_n_clicks + 1
                 if edit_item.summary_relevant:
                     o_summary_footer_children = layout.make.make_footer(__lc__)
                     o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
@@ -463,25 +475,26 @@ def call(
             update["old_row"] = json.loads(update["old_row"])
             colid = update.get("colId")
             o_tradinglog_rowTransaction = dict()
-            add = list()
+            added = list()
             if colid:
                 edit_item = __lc__.edit({"colId": colid, "data": update["new_row"], "oldValue": update["old_row"].get(colid)})
             else:
                 edit_item = __lc__.update(update["new_row"], update["old_row"])
             if edit_item.added:
-                add = edit_item.added
-            if ((not colid) and (update["new_row"]["id"] in (0, len(__lc__.__mainFrame__) - 1))) or add_top_row(i_tradinglog_rowData):
-                add.append(__lc__.new_row().row_dat)
-            if add:
-                o_tradinglog_rowTransaction = {"add": add, "addIndex": 0}
-            save()
+                added = edit_item.added
+            if ((not colid) and (update["new_row"]["id"] in (0, len(__lc__.__mainFrame__) - 1))) or do_add_row(i_tradinglog_rowData):
+                added.append(__lc__.new_row().row_dat)
+            if added:
+                o_tradinglog_rowTransaction = {"add": added, "addIndex": 0}
             o_tradinglog_rowTransaction |= {"update": edit_item.updates}
-            o_style_trigger_n_clicks = i_style_trigger_n_clicks + 1
+            if not edit_item.same_type:
+                o_renderer_trigger_n_clicks = i_renderer_trigger_n_clicks + 1
             if edit_item.summary_relevant:
                 o_summary_footer_children = layout.make.make_footer(__lc__)
                 o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
             elif edit_item.id_relevant:
                 o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
+            save()
 
         # show balance / show statistics
         elif __trigger__ in (layout.balance.BALANCE.id, layout.statistics.STATISTICS.id):
@@ -512,7 +525,7 @@ def call(
             if i_drag_event_receiver_value:
                 drag_event_receiver_ = loads(i_drag_event_receiver_value)
                 order = tuple(int(i.split("-")[1]) for i in drag_event_receiver_["target_children"])
-                order = tuple(order.index(i) + 1 for i in range(1, 8))
+                order = tuple(order.index(i) + 1 for i in range(1, rc.nStatisticsDrag + 1))
                 layout.make.performance.OBJ.opt__order(order)
                 o_performance_graph_figure = layout.make.performance.OBJ.get().update_layout(height=i_performance_size_slider_value)
 
@@ -555,7 +568,8 @@ def call(
         # course update
         elif __trigger__ == layout.header.update_interval.id:
             o_update_interval_disabled = True
-            o_update_interval_trigger_n_clicks = i_update_interval_trigger_n_clicks + 1
+            if i_update_interval_button_trigger_n_clicks:
+                o_update_interval_trigger_n_clicks = i_update_interval_trigger_n_clicks + 1
 
         # toggle course update
         elif __trigger__ == layout.header.update_interval_button_trigger.id:
@@ -567,7 +581,7 @@ def call(
         o_summary_footer_style = i_summary_footer_style | styles.misc.summary_error
         o_tradinglog_rowTransaction = no_update
     else:
-        o_summary_footer_style = i_summary_footer_style | styles.misc.summary_error_reset
+        o_summary_footer_style = i_summary_footer_style | styles.misc.summary_error_reset | rc.get_footer_live_signal()
 
     return _return()
 
@@ -575,7 +589,6 @@ def call(
 @callback(
     Output(layout.tradinglog, "rowTransaction", allow_duplicate=True),
     Output(layout.summary_footer, "children", allow_duplicate=True),
-    Output(layout.style_trigger, "n_clicks", allow_duplicate=True),
     Output(layout.statistics.open_positions_graph, "figure", allow_duplicate=True),
     Output(layout.statistics.all_positions_graph, "figure", allow_duplicate=True),
     Output(layout.statistics.performance_graph, "figure", allow_duplicate=True),
@@ -586,7 +599,6 @@ def call(
     ##############################################################################################
     Input(layout.header.update_interval_trigger, "n_clicks"),
     State(layout.header.with_open_trigger, "n_clicks"),
-    State(layout.style_trigger, "n_clicks"),
     State(layout.statistics.performance_size_slider, "value"),
     State(layout.statistics.performance_steps, "value"),
     State(layout.statistics.performance_trailing_frame, "value"),
@@ -608,7 +620,6 @@ def call(
 def course_update(
         _,
         i_with_open_value,
-        i_style_trigger_n_clicks,
         i_performance_size_slider_value,
         i_performance_steps_value,
         i_performance_trailing_frame_value,
@@ -626,10 +637,9 @@ def course_update(
         i_group_by_trigger_n_clicks,
         i_summary_footer_style,
 ):
+    o_summary_footer_style = o_tradinglog_rowTransaction = o_summary_footer_children = o_open_positions_graph_figure = o_all_positions_graph_figure = o_performance_graph_figure = o_drag_container_style = o_BALANCE_children = o_update_interval_disabled = no_update
     try:
-        o_summary_footer_style = o_tradinglog_rowTransaction = o_summary_footer_children = o_style_trigger_n_clicks = o_open_positions_graph_figure = o_all_positions_graph_figure = o_performance_graph_figure = o_drag_container_style = o_BALANCE_children = o_update_interval_disabled = no_update
         o_tradinglog_rowTransaction = {"update": __lc__.update_course()}
-        o_style_trigger_n_clicks = i_style_trigger_n_clicks + 1
         o_update_interval_disabled = False
         if i_with_open_value % 2:
             if i_scope_by_button_n_clicks % 2:
@@ -650,12 +660,11 @@ def course_update(
         o_summary_footer_style = i_summary_footer_style | styles.misc.summary_error
         o_tradinglog_rowTransaction = no_update
     else:
-        o_summary_footer_style = i_summary_footer_style | styles.misc.summary_error_reset
+        o_summary_footer_style = i_summary_footer_style | styles.misc.summary_error_reset | rc.get_footer_live_signal()
 
     return (
         o_tradinglog_rowTransaction,
         o_summary_footer_children,
-        o_style_trigger_n_clicks,
         o_open_positions_graph_figure,
         o_all_positions_graph_figure,
         o_performance_graph_figure,
@@ -677,9 +686,9 @@ def sync_column_styles():
             refresh();
             setTimeout(refresh, 1);
             return window.dash_clientside.no_update
-        }""" % layout.tradinglog.id,
+        }""" % (layout.tradinglog.id,),
         Output(layout.tradinglog, 'id'),
-        Input(layout.style_trigger, 'n_clicks'),
+        Input(layout.renderer_trigger, 'n_clicks'),
     )
 
 

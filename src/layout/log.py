@@ -5,49 +5,6 @@ from src.config.functional import log_columns
 
 __debug = 0
 
-_dataTypeDefinitions = {
-    'percentage': {
-        'extendsDataType': 'number',
-        'baseDataType': 'number',
-        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.2%')(params.value)"},
-        "columnTypes": "rightAligned",
-        "appendColumnTypes": True
-    },
-    'percentage3': {
-        'extendsDataType': 'number',
-        'baseDataType': 'number',
-        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.3%')(params.value)"},
-        "columnTypes": "rightAligned",
-        "appendColumnTypes": True
-    },
-    'prefixed': {
-        'extendsDataType': 'number',
-        'baseDataType': 'number',
-        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.2f')(params.value)"},
-        "columnTypes": "rightAligned",
-        "appendColumnTypes": True
-    },
-    'prefixed3': {
-        'extendsDataType': 'number',
-        'baseDataType': 'number',
-        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.3f')(params.value)"},
-        "columnTypes": "rightAligned",
-        "appendColumnTypes": True
-    },
-    'grouped': {
-        'extendsDataType': 'number',
-        'baseDataType': 'number',
-        "valueFormatter": {"function": "params.value == null ? '' :  d3.format(',.2f')(params.value)"},
-        "columnTypes": "rightAligned",
-        "appendColumnTypes": True
-    },
-    'timedelta': {
-        'extendsDataType': 'number',
-        'baseDataType': 'number',
-        "columnTypes": "rightAligned",
-        "appendColumnTypes": True
-    },
-}
 
 _columns_ = [
     {
@@ -119,7 +76,6 @@ _columns_ = [
                 "field": "InvestAmount",
                 "headerName": "Amount",
                 "type": "rightAligned",
-                "cellDataType": "grouped",
                 "filterParams": {
                     "buttons": ["clear"],
                     "defaultOption": "greaterThan",
@@ -131,7 +87,6 @@ _columns_ = [
                 "headerName": "Course",
                 "type": "rightAligned",
                 "editable": True,
-                "cellDataType": "grouped",
                 "filterParams": {
                     "buttons": ["clear"],
                     "defaultOption": "greaterThan",
@@ -159,7 +114,6 @@ _columns_ = [
                 "field": "TakeAmount",
                 "headerName": "Amount",
                 "type": "rightAligned",
-                "cellDataType": "grouped",
                 "filterParams": {
                     "buttons": ["clear"],
                     "defaultOption": "greaterThan",
@@ -171,7 +125,6 @@ _columns_ = [
                 "headerName": "Course",
                 "type": "rightAligned",
                 "editable": True,
-                "cellDataType": "grouped",
                 "filterParams": {
                     "buttons": ["clear"],
                     "defaultOption": "greaterThan",
@@ -184,7 +137,6 @@ _columns_ = [
         "field": "ITC",
         "headerName": "+ITC",
         "type": "rightAligned",
-        "cellDataType": "grouped",
         "filterParams": {
             "buttons": ["clear"],
             "defaultOption": "greaterThan",
@@ -299,7 +251,7 @@ _default_col_def = {
 }
 
 _dashGridOptions = {
-    "dataTypeDefinitions": _dataTypeDefinitions,
+    "dataTypeDefinitions": log_columns.dataTypeDefinitions,
     "tooltipShowDelay": 0,
     "undoRedoCellEditing": True,
     "undoRedoCellEditingLimit": 20,
@@ -311,7 +263,7 @@ tradinglog = dag.AgGrid(
     defaultColDef=_default_col_def,
     dashGridOptions=_dashGridOptions,
     getRowId="params.data.id",
-    className=styles.color_theme.table_theme,
+    className=styles.color_theme.table_theme + " ag-alt-colors",
     dangerously_allow_code=True,
     style={
         "height": "100%",

@@ -63,6 +63,28 @@ POP = dbc.Modal([
     fullscreen=True,
 )
 
+
+_dragcontainer = list()
+_dragcontainer_ids = list()
+for i in rc.statisticsPerformanceOrder:
+    if i not in _dragcontainer_ids:
+        _dragcontainer_ids.append(i)
+        _dragcontainer.append(
+            html.Div(
+                [
+                    html.Div("☰", style={"border": "1px solid", "width": "5240%", "height": "100%"})
+                ],
+                id=f"drag_component-{i}",
+                style={
+                    "height": f"calc(100% / {rc.nStatisticsDrag})",
+                    "cursor": "row-resize",
+                    "fontSize": "18px",
+                    "borderRight": "1px solid",
+                    "width": "100%",
+                }
+            )
+        )
+
 STATISTICS = html.Div([
     html.Div([
         html.H4("Statistics", style={"display": "inline-block"}),
@@ -177,22 +199,7 @@ STATISTICS = html.Div([
                     ),
                     html.Div([
                         drag_container := html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.Div("☰", style={"border": "1px solid", "width": "5240%", "height": "100%"})
-                                    ],
-                                    id="drag_component-%d" % i,
-                                    style={
-                                        "height": "calc(100% / 7)",
-                                        "cursor": "row-resize",
-                                        "fontSize": "18px",
-                                        "borderRight": "1px solid",
-                                        "width": "100%",
-                                    }
-                                )
-                                for i in range(1, 8)
-                            ],
+                            _dragcontainer,
                             id="drag_container_",
                             style={
                                 "display": "inline-block",

@@ -1,6 +1,58 @@
 from src.config import rc
 from src.config.styles.log import *
 
+
+dataTypeDefinitions = {
+    'percentage': {
+        'extendsDataType': 'number',
+        'baseDataType': 'number',
+        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.2%')(params.value)"},
+        "columnTypes": "rightAligned",
+        "appendColumnTypes": True
+    },
+    'percentage3': {
+        'extendsDataType': 'number',
+        'baseDataType': 'number',
+        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.3%')(params.value)"},
+        "columnTypes": "rightAligned",
+        "appendColumnTypes": True
+    },
+    'prefixed': {
+        'extendsDataType': 'number',
+        'baseDataType': 'number',
+        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.2f')(params.value)"},
+        "columnTypes": "rightAligned",
+        "appendColumnTypes": True
+    },
+    'prefixed3': {
+        'extendsDataType': 'number',
+        'baseDataType': 'number',
+        "valueFormatter": {"function": "params.value == null ? '' :  d3.format('+,.3f')(params.value)"},
+        "columnTypes": "rightAligned",
+        "appendColumnTypes": True
+    },
+    'grouped': {
+        'extendsDataType': 'number',
+        'baseDataType': 'number',
+        "valueFormatter": {"function": "params.value == null ? '' :  d3.format(',.2f')(params.value)"},
+        "columnTypes": "rightAligned",
+        "appendColumnTypes": True
+    },
+    'timedelta': {
+        'extendsDataType': 'number',
+        'baseDataType': 'number',
+        "columnTypes": "rightAligned",
+        "appendColumnTypes": True
+    },
+}
+
+
+_calcCell = {
+    "valueFormatter": {"function": "params.value == null ? '' :  d3.format(',.2f')(params.value)"},
+    "valueParser": {"function": "calc(params.newValue)"},
+}
+
+
 Name = {
     'cellStyle': {
         "styleConditions": [
@@ -151,9 +203,9 @@ InvestAmount = {
     },
     "width": rc.logColWidths[5],
     "hide": not rc.logColWidths[5]
-}
+} | _calcCell
 
-InvestCourse = InvestTime | {"width": rc.logColWidths[6], "hide": not rc.logColWidths[6]}
+InvestCourse = InvestTime | {"width": rc.logColWidths[6], "hide": not rc.logColWidths[6]} | _calcCell
 
 TakeTime = {
     'cellStyle': {
@@ -205,9 +257,9 @@ TakeAmount = {
     },
     "width": rc.logColWidths[8],
     "hide": not rc.logColWidths[8]
-}
+} | rc.cellRendererChangeTakeAmount | _calcCell
 
-TakeCourse = TakeTime | {"width": rc.logColWidths[9], "hide": not rc.logColWidths[9]}
+TakeCourse = TakeTime | {"width": rc.logColWidths[9], "hide": not rc.logColWidths[9]} | rc.cellRendererChangeTakeCourse | _calcCell
 
 
 Itc = {
@@ -238,7 +290,7 @@ Itc = {
     },
     "width": rc.logColWidths[10],
     "hide": not rc.logColWidths[10]
-}
+} | _calcCell
 
 Performance = {
     'cellStyle': {
@@ -272,7 +324,7 @@ Performance = {
     },
     "width": rc.logColWidths[12],
     "hide": not rc.logColWidths[12]
-}
+} | rc.cellRendererChangePerformance
 
 Profit = {
     'cellStyle': {
@@ -294,7 +346,7 @@ Profit = {
     },
     "width": rc.logColWidths[11],
     "hide": not rc.logColWidths[11]
-}
+} | rc.cellRendererChangeProfit
 
 Dividend = {
     'cellStyle': {

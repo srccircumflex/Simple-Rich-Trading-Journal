@@ -7,7 +7,7 @@ from numpy import array, ndarray
 from plotly.subplots import make_subplots
 
 from src.calc.log import LogCalc, TradeFrameCalc
-from src.config import styles, time_formats
+from src.config import styles, time_formats, rc
 
 
 class _Performance:
@@ -24,8 +24,10 @@ class _Performance:
     order: tuple[int, int, int, int, int, int, int]
 
     profits: list | ndarray
+    summary: list | ndarray
     current_performances: list | ndarray
     dripping_performances: list | ndarray
+    summary_rate: list | ndarray
     deposits: list | ndarray
     trade_invests: list | ndarray
     trade_takes: list | ndarray
@@ -51,12 +53,12 @@ class _Performance:
     def __init__(
             self,
             lc: LogCalc,
-            by_attr: Literal["idx", "min", "max", "or"] | str = "or",
-            step_time: timedelta = timedelta(weeks=1),
-            trailing_frame: timedelta = timedelta(weeks=12),
-            trailing_interval: timedelta = timedelta(weeks=1),
-            range_: timedelta = timedelta(0),
-            order: tuple[int, int, int, int, int, int, int] = tuple(range(1, 8))
+            by_attr: Literal["idx", "min", "max", "or"] | str,
+            step_time: timedelta,
+            trailing_frame: timedelta,
+            trailing_interval: timedelta,
+            range_: timedelta,
+            order
     ):
         self.lc = lc
         self.opt__by_attr(by_attr)
@@ -80,7 +82,7 @@ class _Performance:
         self.range_ = range_
         self.new_calc = True
         
-    def opt__order(self, order: tuple[int, int, int, int, int, int, int] | tuple = tuple(range(1, 8))):
+    def opt__order(self, order):
         self.order = order
         self.new_vis = True
     
@@ -93,8 +95,10 @@ class _Performance:
                 self.new_vis = True
 
                 self.profits = list()
+                self.summary = list()
                 self.current_performances = list()
                 self.dripping_performances = list()
+                self.summary_rate = list()
                 self.deposits = list()
                 self.trade_invests = list()
                 self.trade_takes = list()
@@ -107,8 +111,10 @@ class _Performance:
                 while (last := last + self.step_time) <= self.lc.last_record.index_date:
                     frame = self.lc.getTradeFrame(first, last)
                     self.profits.append(frame.sum_profits)
+                    self.summary.append(frame.summary_value)
                     self.current_performances.append(frame.current_performance_on_portfolio)
                     self.dripping_performances.append(frame.dripping_performance_avg)
+                    self.summary_rate.append(frame.current_summary_rate)
                     self.deposits.append(frame.money)
                     self.trade_invests.append(frame.sum_fin_invest)
                     self.trade_takes.append(frame.sum_fin_take)
@@ -125,8 +131,10 @@ class _Performance:
                             break
 
                     self.profits = self.profits[i:]
+                    self.summary = self.summary[i:]
                     self.current_performances = self.current_performances[i:]
                     self.dripping_performances = self.dripping_performances[i:]
+                    self.summary_rate = self.summary_rate[i:]
                     self.deposits = self.deposits[i:]
                     self.trade_invests = self.trade_invests[i:]
                     self.trade_takes = self.trade_takes[i:]
@@ -136,8 +144,10 @@ class _Performance:
                     self.dates = self.dates[i:]
 
                 self.profits.append(self.lc.sum_profits)
+                self.summary.append(self.lc.summary_value)
                 self.current_performances.append(self.lc.current_performance_on_portfolio)
                 self.dripping_performances.append(self.lc.dripping_performance_avg)
+                self.summary_rate.append(self.lc.current_summary_rate)
                 self.deposits.append(self.lc.money)
                 self.trade_invests.append(self.lc.sum_fin_invest)
                 self.trade_takes.append(self.lc.sum_fin_take)
@@ -206,8 +216,10 @@ class _Performance:
                     self.payouts_amount = array(self.payouts_amount[i:])
 
                 self.profits = array(self.profits)
+                self.summary = array(self.summary)
                 self.current_performances = array(self.current_performances)
                 self.dripping_performances = array(self.dripping_performances)
+                self.summary_rate = array(self.summary_rate)
                 self.deposits = array(self.deposits)
                 self.trade_invests = array(self.trade_invests)
                 self.trade_takes = array(self.trade_takes)
@@ -235,16 +247,8 @@ class _Performance:
             update_figure = True
 
             self.figure = make_subplots(
-                rows=7, cols=1,
-                specs=[
-                    [{"secondary_y": True}],
-                    [{"secondary_y": True}],
-                    [{"secondary_y": True}],
-                    [{"secondary_y": True}],
-                    [{"secondary_y": True}],
-                    [{"secondary_y": True}],
-                    [{"secondary_y": True}],
-                ],
+                rows=rc.nStatisticsDrag, cols=1,
+                specs=[[{"secondary_y": True}],] * rc.nStatisticsDrag,
                 shared_xaxes=True,
                 horizontal_spacing=0.01,
                 vertical_spacing=0.01,
@@ -257,7 +261,7 @@ class _Performance:
                 date = date.strftime("%Y-%m-%d")
                 self.figure.add_shape(
                     type="line",
-                    xref="x7",
+                    xref=f"x{rc.nStatisticsDrag}",
                     yref="paper",
                     x0=date,
                     x1=date,
@@ -271,7 +275,7 @@ class _Performance:
                 )
                 self.figure.add_shape(
                     type="rect",
-                    xref="x7",
+                    xref=f"x{rc.nStatisticsDrag}",
                     yref="paper",
                     y0=0.003,
                     y1=0.003,
@@ -285,8 +289,8 @@ class _Performance:
                     name="Profits",
                     y=self.profits,
                     x=self.dates,
-                    line=dict(color=styles.color_theme.trace_total_profit),
-                    marker=dict(color=styles.color_theme.trace_total_profit),
+                    line=dict(color=styles.color_theme.trace_profit),
+                    marker=dict(color=styles.color_theme.trace_profit),
                     showlegend=False
                 ),
                 row=self.order[0], col=1, secondary_y=False
@@ -317,6 +321,30 @@ class _Performance:
             )
 
             self.figure.add_trace(
+                go.Scatter(
+                    name="Summary",
+                    y=self.summary,
+                    x=self.dates,
+                    line=dict(color=styles.color_theme.trace_summary),
+                    marker=dict(color=styles.color_theme.trace_summary),
+                    showlegend=False
+                ),
+                row=self.order[1], col=1, secondary_y=False
+            )
+
+            self.figure.add_trace(
+                go.Scatter(
+                    name="Summary Rate",
+                    y=self.summary_rate,
+                    x=self.dates,
+                    line=dict(color=styles.color_theme.trace_summary_rate),
+                    marker=dict(color=styles.color_theme.trace_summary_rate),
+                    showlegend=False
+                ),
+                row=self.order[1], col=1, secondary_y=True
+            )
+
+            self.figure.add_trace(
                 go.Bar(
                     name="Deposits",
                     y=self.deposits_amount,
@@ -324,7 +352,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_deposit, line=dict(width=0)),
                     showlegend=False
                 ),
-                row=self.order[1], col=1, secondary_y=False
+                row=self.order[2], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -335,7 +363,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_payout, line=dict(width=0)),
                     showlegend=False,
                 ),
-                row=self.order[1], col=1, secondary_y=False
+                row=self.order[2], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -347,7 +375,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_money),
                     showlegend=False
                 ),
-                row=self.order[1], col=1, secondary_y=True
+                row=self.order[2], col=1, secondary_y=True
             )
 
             self.figure.add_trace(
@@ -359,7 +387,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_trade_sum_invest),
                     showlegend=False
                 ),
-                row=self.order[2], col=1, secondary_y=False
+                row=self.order[3], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -371,7 +399,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_trade_sum_take),
                     showlegend=False
                 ),
-                row=self.order[2], col=1, secondary_y=False
+                row=self.order[3], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -383,7 +411,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_trade_performance),
                     showlegend=False
                 ),
-                row=self.order[2], col=1, secondary_y=True
+                row=self.order[3], col=1, secondary_y=True
             )
 
             self.figure.add_trace(
@@ -395,7 +423,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_profit_per_day_avg),
                     showlegend=False
                 ),
-                row=self.order[3], col=1, secondary_y=False
+                row=self.order[4], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -407,7 +435,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_performance_per_day_avg),
                     showlegend=False
                 ),
-                row=self.order[3], col=1, secondary_y=True
+                row=self.order[4], col=1, secondary_y=True
             )
 
             self.figure.add_trace(
@@ -419,7 +447,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_trade_sum_invest_trailing),
                     showlegend=False
                 ),
-                row=self.order[4], col=1, secondary_y=False
+                row=self.order[5], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -431,7 +459,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_trade_sum_take_trailing),
                     showlegend=False
                 ),
-                row=self.order[4], col=1, secondary_y=False
+                row=self.order[5], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -443,7 +471,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_trade_performance_trailing),
                     showlegend=False
                 ),
-                row=self.order[4], col=1, secondary_y=True
+                row=self.order[5], col=1, secondary_y=True
             )
 
             self.figure.add_trace(
@@ -455,7 +483,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_profit_per_day_avg_trailing),
                     showlegend=False
                 ),
-                row=self.order[5], col=1, secondary_y=False
+                row=self.order[6], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -467,7 +495,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_performance_per_day_avg_trailing),
                     showlegend=False
                 ),
-                row=self.order[5], col=1, secondary_y=True
+                row=self.order[6], col=1, secondary_y=True
             )
 
             self.figure.add_trace(
@@ -479,7 +507,7 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_activity),
                     showlegend=False,
                 ),
-                row=self.order[6], col=1, secondary_y=False
+                row=self.order[7], col=1, secondary_y=False
             )
 
             self.figure.add_trace(
@@ -491,14 +519,14 @@ class _Performance:
                     marker=dict(color=styles.color_theme.trace_holdtime_avg),
                     showlegend=False
                 ),
-                row=self.order[6], col=1, secondary_y=True
+                row=self.order[7], col=1, secondary_y=True
             )
 
         if update_figure:
 
             self.figure.update_yaxes(
                 title=dict(
-                    text="Total Profit"
+                    text="Profit"
                 ),
                 showline=True,
                 row=self.order[0], col=1
@@ -513,16 +541,31 @@ class _Performance:
             )
             self.figure.update_yaxes(
                 title=dict(
-                    text="Payouts | Deposits"
+                    text="Summary"
                 ),
                 showline=True,
                 row=self.order[1], col=1
             )
             self.figure.update_yaxes(
                 title=dict(
+                    text="Rate"
+                ),
+                tickformat=",.2%",
+                row=self.order[1], col=1,
+                secondary_y=True
+            )
+            self.figure.update_yaxes(
+                title=dict(
+                    text="Payouts | Deposits"
+                ),
+                showline=True,
+                row=self.order[2], col=1
+            )
+            self.figure.update_yaxes(
+                title=dict(
                     text="Money"
                 ),
-                row=self.order[1], col=1,
+                row=self.order[2], col=1,
                 secondary_y=True
             )
             self.figure.update_yaxes(
@@ -530,13 +573,13 @@ class _Performance:
                     text="Invest & Take<br>Alltime"
                 ),
                 showline=True,
-                row=self.order[2], col=1
+                row=self.order[3], col=1
             )
             self.figure.update_yaxes(
                 title=dict(
                     text="Take - Invest"
                 ),
-                row=self.order[2], col=1,
+                row=self.order[3], col=1,
                 secondary_y=True
             )
             self.figure.update_yaxes(
@@ -544,26 +587,11 @@ class _Performance:
                     text="Ø Profit/Day"
                 ),
                 showline=True,
-                row=self.order[3], col=1
-            )
-            self.figure.update_yaxes(
-                title=dict(
-                    text="Ø Perf./Day"
-                ),
-                tickformat=",.2%",
-                row=self.order[3], col=1,
-                secondary_y=True
-            )
-            self.figure.update_yaxes(
-                title=dict(
-                    text="~ Invest & Take"
-                ),
-                showline=True,
                 row=self.order[4], col=1
             )
             self.figure.update_yaxes(
                 title=dict(
-                    text="~Ø Performance"
+                    text="Ø Perf./Day"
                 ),
                 tickformat=",.2%",
                 row=self.order[4], col=1,
@@ -571,14 +599,14 @@ class _Performance:
             )
             self.figure.update_yaxes(
                 title=dict(
-                    text="~Ø Profit/Day"
+                    text="~ Invest & Take"
                 ),
                 showline=True,
                 row=self.order[5], col=1
             )
             self.figure.update_yaxes(
                 title=dict(
-                    text="~Ø Perf./Day"
+                    text="~Ø Performance"
                 ),
                 tickformat=",.2%",
                 row=self.order[5], col=1,
@@ -586,16 +614,31 @@ class _Performance:
             )
             self.figure.update_yaxes(
                 title=dict(
-                    text="~ Activity"
+                    text="~Ø Profit/Day"
                 ),
                 showline=True,
                 row=self.order[6], col=1
             )
             self.figure.update_yaxes(
                 title=dict(
+                    text="~Ø Perf./Day"
+                ),
+                tickformat=",.2%",
+                row=self.order[6], col=1,
+                secondary_y=True
+            )
+            self.figure.update_yaxes(
+                title=dict(
+                    text="~ Activity"
+                ),
+                showline=True,
+                row=self.order[7], col=1
+            )
+            self.figure.update_yaxes(
+                title=dict(
                     text="~Ø Hold Days"
                 ),
-                row=self.order[6], col=1,
+                row=self.order[7], col=1,
                 secondary_y=True
             )
 
@@ -625,7 +668,7 @@ class _Performance:
                 showline=False,
             )
 
-            self.figure.update_traces(xaxis="x7")
+            self.figure.update_traces(xaxis=f"x{rc.nStatisticsDrag}")
 
             self.figure.update_layout(
                 dict(plot_bgcolor=styles.figures.color_bg_plot, paper_bgcolor=styles.figures.color_bg_paper),
@@ -640,12 +683,12 @@ class _Performance:
     @staticmethod
     def new(
             lc: LogCalc,
-            by_attr: Literal["idx", "min", "max", "or"] | str = "or",
-            step_time: timedelta = timedelta(weeks=1),
-            trailing_frame: timedelta = timedelta(weeks=12),
-            trailing_interval: timedelta = timedelta(weeks=1),
-            range_: timedelta = timedelta(0),
-            order: tuple[int, int, int, int, int, int, int] = tuple(range(1, 8)),
+            by_attr: Literal["idx", "min", "max", "or"] | str,
+            step_time: timedelta,
+            trailing_frame: timedelta,
+            trailing_interval: timedelta,
+            range_: timedelta,
+            order
     ):
         global OBJ
         OBJ = _Performance(lc, by_attr, step_time, trailing_frame, trailing_interval, range_, order)

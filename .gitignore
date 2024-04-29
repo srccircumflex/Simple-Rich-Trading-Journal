@@ -160,4 +160,5 @@ cython_debug/
 .idea/
 
 src/cache/*.pickle
-demo/demo--tradinglog-history.pickle
+demo/*.pickle
+prconfig.py

@@ -120,7 +120,7 @@ LAYOUT = html.Div(
         ),
         html.Div(
             [
-                style_trigger := html.Div(id="style_trigger_", n_clicks=0),
+                renderer_trigger := html.Div(id="style_trigger_", n_clicks=0),
                 c2Hide_trigger := html.Div(id="c2Hide_trigger_", n_clicks=0),
                 drag_event_receiver := dbc.Input(type="text", id="drag_event_receiver_", style={'visibility': 'hidden', "display": "none"}),
                 edit_event_receiver := dbc.Input(type="text", id="edit_event_receiver_", style={'visibility': 'hidden', "display": "none"}),
