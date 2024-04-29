@@ -202,13 +202,15 @@ The value in *Performance* represents the rate to the sum of previous deposits.
 Nice to know
 ============
 
-- The project has so far only been tested on ``Mozilla Firefox 125.0.2`` under Linux.
+- The project has so far only been tested on ``Mozilla Firefox 125.0.2`` on Linux.
 
 - Before the log is (further) edited, large calculations should be completed.
 
 - When calculations are running, ``working...`` is displayed in the tab label.
 
 - The log is recalculated when a defined record is detected or changed.
+
+- Reload the page to reorder all the records.
 
 - Copy/paste functions are implemented but still buggy.
 
@@ -267,6 +269,7 @@ Nice to know
   This disappears after the next edit without errors.
   If the error cannot be identified, the page should be reloaded.
 
+- Debug by reloading the page.
 
 ----
 
