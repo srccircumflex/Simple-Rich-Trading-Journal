@@ -5,7 +5,7 @@ from secrets import choice, randbelow
 
 import demo
 from src.calc.log import Deposit, Payout, TradeOpen, TradeFinalized, Dividend, Itc
-from src.config import time_formats, rc
+from src.config import rc
 
 example_assets = {
     'TechNova Solutions': ["TechNova Solutions", "Technology", "TNVS", 0.0],
@@ -166,13 +166,13 @@ def make():
     def deposit():
         amount = (randint(10, 60) / 2) * 100
         _money.cash += amount
-        _deposits.append(Deposit({"n": 0, "InvestAmount": amount, "InvestTime": time.strftime(rc.transactionTimeFormat)}, time, amount, now))
+        _deposits.append(Deposit({"n": 0, "InvestAmount": amount, "InvestTime": time.strftime(rc.timeFormatTransaction)}, time, amount, now))
 
     def payout():
         if (x := _money.cash // 100) > 10:
             amount = (randint(1, int(x) - 9) / 5) * 100
             _money.cash -= amount
-            _payouts.append(Payout({"n": 0, "TakeAmount": amount, "TakeTime": time.strftime(rc.transactionTimeFormat)}, time, amount, now))
+            _payouts.append(Payout({"n": 0, "TakeAmount": amount, "TakeTime": time.strftime(rc.timeFormatTransaction)}, time, amount, now))
 
     def trading(lo=True):
         if _open_trades and randint(0, (x := len(_open_trades)) + 12) > 11:
@@ -185,7 +185,7 @@ def make():
                     trading(False)
             amount = trade.data["InvestAmount"] * randrate()
             _money.cash += amount
-            _finalized_trades.append(TradeFinalized(trade.data | {"TakeAmount": amount, "TakeTime": time.strftime(rc.transactionTimeFormat)}, time, amount, now))
+            _finalized_trades.append(TradeFinalized(trade.data | {"TakeAmount": amount, "TakeTime": time.strftime(rc.timeFormatTransaction)}, time, amount, now))
         elif (x := _money.cash // 100) > 5:
             amount = x * randint(50, 80) / 100
             for i in range(randint(3, 8)):
@@ -205,7 +205,7 @@ def make():
                 amount = asset[-1] * n
                 asset[-1] *= randrate()
             _money.cash -= amount
-            _open_trades.append(TradeOpen({"n": n, "Name": asset[0], "Symbol": asset[2], "Type": asset[1], "InvestAmount": amount, "InvestTime": time.strftime(rc.transactionTimeFormat)}, time, amount, now, False))
+            _open_trades.append(TradeOpen({"n": n, "Name": asset[0], "Symbol": asset[2], "Type": asset[1], "InvestAmount": amount, "InvestTime": time.strftime(rc.timeFormatTransaction)}, time, amount, now, False))
         else:
             deposit()
 
@@ -214,7 +214,7 @@ def make():
             trade = choice(_open_trades)
             amount = trade["InvestAmount"] * randrate2()
             _money.cash += amount
-            _dividends.append(Dividend({"n": 0, "Name": trade["Name"], "TakeAmount": amount, "TakeTime": time.strftime(rc.transactionTimeFormat)}, time, amount, now, False))
+            _dividends.append(Dividend({"n": 0, "Name": trade["Name"], "TakeAmount": amount, "TakeTime": time.strftime(rc.timeFormatTransaction)}, time, amount, now, False))
         else:
             trading()
 
@@ -225,9 +225,9 @@ def make():
                 amount *= -1
             _money.cash += amount
             if randint(0, 10) > 3:
-                _itc.append(Itc({"n": 0, "ITC": amount, "InvestTime": time.strftime(rc.transactionTimeFormat)}, time, amount, now, True))
+                _itc.append(Itc({"n": 0, "ITC": amount, "InvestTime": time.strftime(rc.timeFormatTransaction)}, time, amount, now, True))
             else:
-                _itc.append(Itc({"n": 0, "ITC": amount, "TakeTime": time.strftime(rc.transactionTimeFormat)}, time, amount, now, False))
+                _itc.append(Itc({"n": 0, "ITC": amount, "TakeTime": time.strftime(rc.timeFormatTransaction)}, time, amount, now, False))
         else:
             deposit()
 

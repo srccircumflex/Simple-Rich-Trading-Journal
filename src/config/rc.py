@@ -11,7 +11,12 @@ from . import color_theme
 
 
 dateFormat = {"ISO 8601": "ydm", "american": "mdy", "international": "dmy"}.get(dateFormat, dateFormat)
-transactionTimeFormat = {"ydm": "%y/%d/%m %H:%M", "mdy": "%m/%d/%y %H:%M", "dmy": "%d/%m/%y %H:%M"}[dateFormat]
+timeFormatTransaction, timeFormatHistory, timeFormatDaterange, timeFormatLastCalc = {
+    "ydm": ("%y/%d/%m %H:%M", "\u2007\u2007%a. %y/%d/%m %H:%M.%S", "YY/DD/MM", "%y / %d / %m"),
+    "mdy": ("%m/%d/%y %H:%M", "\u2007\u2007%a. %m/%d/%y %H:%M.%S", "MM/DD/YY", "%m / %d / %y"),
+    "dmy": ("%d/%m/%y %H:%M", "\u2007\u2007%a. %d/%m/%y %H:%M.%S", "DD/MM/YY", "%d / %m / %y"),
+}[dateFormat]
+
 
 with open(ROOT + "/assets/rc.js", "w") as f:
     f.write(
@@ -20,7 +25,6 @@ with open(ROOT + "/assets/rc.js", "w") as f:
         f"const {gridMinWidthScale=};"
         f"const {gridRow3Height=};"
         f"const {dateFormat=};"
-        f"const {transactionTimeFormat=};"
     )
 
 with open(ROOT + "/assets/rc.css", "w") as f:

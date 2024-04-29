@@ -5,7 +5,7 @@ from time import time
 from datetime import datetime
 
 from src import CACHE_TRADINGLOG, CACHE_TRADINGLOG_HISTORY
-from src.config import rc, time_formats
+from src.config import rc
 import plugin
 
 
@@ -19,7 +19,7 @@ PICKLE_PROTOCOL = pickle.HIGHEST_PROTOCOL
 
 def init():
     global INIT_DATA, HISTORY_DATA, HISTORY_KEYS_X_TIME_REVSORT, LAST_HISTORY_CREATION_TIME
-    __firstrun = [{"id": 0, "n": 0, "InvestTime": datetime.now().strftime(rc.transactionTimeFormat), "InvestAmount": 1}]
+    __firstrun = [{"id": 0, "n": 0, "InvestTime": datetime.now().strftime(rc.timeFormatTransaction), "InvestAmount": 1}]
     try:
         with open(CACHE_TRADINGLOG, "rb") as __f:
             INIT_DATA = pickle.load(__f)

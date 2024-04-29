@@ -1,6 +1,6 @@
 from dash import html, dcc
 
-from src.config import styles, rc, time_formats, color_theme
+from src.config import styles, rc, color_theme
 
 _Deposits = "\u2007Deposits \u2007\u2007"
 _Payouts = "\u2007Payouts \u2007\u2007"
@@ -153,10 +153,10 @@ balance_button = html.Button(
 )
 daterange = dcc.DatePickerRange(
     clearable=True,
-    display_format=time_formats.daterange_time_format,
-    start_date_placeholder_text=time_formats.daterange_time_format,
-    end_date_placeholder_text=time_formats.daterange_time_format,
-    first_day_of_week=time_formats.first_day_of_week,
+    display_format=rc.timeFormatDaterange,
+    start_date_placeholder_text=rc.timeFormatDaterange,
+    end_date_placeholder_text=rc.timeFormatDaterange,
+    first_day_of_week=rc.dateFormatFirstDayOfWeek,
     number_of_months_shown=6,
     day_size=20,
     id="daterange_",

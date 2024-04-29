@@ -7,7 +7,7 @@ from numpy import array, ndarray
 from plotly.subplots import make_subplots
 
 from src.calc.log import LogCalc, TradeFrameCalc
-from src.config import styles, time_formats, rc, color_theme
+from src.config import styles, rc, color_theme
 
 
 class _Performance:
@@ -256,7 +256,7 @@ class _Performance:
 
             if self.lc.calc_trades:
                 date = self.lc.calc_trades[-1].index_date
-                date_label = date.strftime(time_formats.shape_last_calc_time_format)
+                date_label = date.strftime(rc.timeFormatLastCalc)
                 date += timedelta(1)
                 date = date.strftime("%Y-%m-%d")
                 self.figure.add_shape(
