@@ -159,6 +159,7 @@ cython_debug/
   option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-src/cache/*.pickle
-demo/*.pickle
+src/cache/*.pkl
+src/cache/~cache
+demo/*.pkl
 prconfig.py
