@@ -268,7 +268,7 @@ Nice to know
   If the error cannot be identified, the page should be reloaded.
 
 
------
+----
 
  The project was realized with the opensource packages from plotly_.
 
