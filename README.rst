@@ -10,7 +10,7 @@ Simple Rich Trading Protocol
 .. image:: ./_doc/main.png
     :align: center
 
-0.1 #1 (2024-04-27)
+0.1 #2 (2024-04-29)
     The project is still being worked on and some scenarios have not been tested.
 
 Install and Run
