@@ -75,7 +75,7 @@ General information
 
 - The first record must be a deposit.
 
-- Some columns have a slightly different meaning or function depending on the type of entry.
+- Some columns have a slightly different meaning or function depending on the type of record.
 
 - The time entries in the *InvestTime* and *TakeTime* columns are parsed automatically and
   can be entered according to the following patterns:
@@ -226,7 +226,7 @@ Nice to know
     Currently, the following error may occur temporarily, which leads to the copy function being blocked:
     ``Uncaught (in promise) DOMException: Clipboard write was blocked due to lack of user activation.``
 
-    The feature can be disabled in |rconfig.py#L|_.
+The feature can be disabled in |rconfig.py#L|_.
 
 - Confirm an entry in *InvestAmount* or *TakeAmount* with Enter, **not with Tap** (BUG).
 
@@ -259,9 +259,9 @@ Nice to know
 
 - Look at `rconfig.py`_
 
-- To import data, `plugin.init_log`_ could be implemented.
-
 - Look at `plugin/__init__.py`_
+
+- To import data, `plugin.init_log`_ could be implemented.
 
 - If internal errors occur after editing, a red stripe appears.
   This disappears after the next edit without errors.
