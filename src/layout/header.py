@@ -1,6 +1,6 @@
 from dash import html, dcc
 
-from src.config import styles, rc, time_formats
+from src.config import styles, rc, time_formats, color_theme
 
 _Deposits = "\u2007Deposits \u2007\u2007"
 _Payouts = "\u2007Payouts \u2007\u2007"
@@ -23,7 +23,7 @@ scopes_x_func = {
 _layout = [
     {"value": _Deposits, "label": html.Span(_Deposits, style=styles.log.name_DEPOSIT_tag)},
     {"value": _Payouts, "label": html.Span(_Payouts, style=styles.log.name_PAYOUT_tag)},
-    {"value": _Fin, "label": html.Span(_Fin, style={"color": styles.color_theme.table_fg_main})},
+    {"value": _Fin, "label": html.Span(_Fin, style={"color": color_theme.table_fg_main})},
     {"value": _Open, "label": html.Span(_Open, style=styles.log.name_opentrade)},
     {"value": _Dividends, "label": html.Span(_Dividends, style=styles.log.name_dividend)},
     {"value": _ITCs, "label": html.Span(_ITCs, style=styles.log.name_ITC_tag)},
@@ -71,9 +71,9 @@ reload_button = html.Button(
 
         "margin": "7px",
         "fontSize": "13px",
-        "color": styles.color_theme.table_fg_header,
-        "backgroundColor": styles.color_theme.table_bg_main,
-        "border": "1px solid " + styles.color_theme.table_sep,
+        "color": color_theme.table_fg_header,
+        "backgroundColor": color_theme.table_bg_main,
+        "border": "1px solid " + color_theme.table_sep,
         "paddingLeft": "10px",
         "paddingRight": "10px",
     }
@@ -86,9 +86,9 @@ history_button = html.Button(
         "display": "inline-block",
         "margin": "7px",
         "fontSize": "13px",
-        "color": styles.color_theme.table_fg_header,
-        "backgroundColor": styles.color_theme.table_bg_main,
-        "border": "1px solid " + styles.color_theme.table_sep,
+        "color": color_theme.table_fg_header,
+        "backgroundColor": color_theme.table_bg_main,
+        "border": "1px solid " + color_theme.table_sep,
         "paddingLeft": "10px",
         "paddingRight": "10px",
     }
@@ -103,9 +103,9 @@ export_button = html.Button(
 
         "margin": "7px",
         "fontSize": "13px",
-        "color": styles.color_theme.table_fg_header,
-        "backgroundColor": styles.color_theme.table_bg_main,
-        "border": "1px solid " + styles.color_theme.table_sep,
+        "color": color_theme.table_fg_header,
+        "backgroundColor": color_theme.table_bg_main,
+        "border": "1px solid " + color_theme.table_sep,
         "paddingLeft": "10px",
         "paddingRight": "10px",
     }
@@ -120,9 +120,9 @@ import_button = html.Button(
 
         "margin": "7px",
         "fontSize": "13px",
-        "color": styles.color_theme.table_fg_header,
-        "backgroundColor": styles.color_theme.table_bg_main,
-        "border": "1px solid " + styles.color_theme.table_sep,
+        "color": color_theme.table_fg_header,
+        "backgroundColor": color_theme.table_bg_main,
+        "border": "1px solid " + color_theme.table_sep,
         "paddingLeft": "10px",
         "paddingRight": "10px",
     }

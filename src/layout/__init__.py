@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 from dash import html
 
-from src.config import styles, rc
+from src.config import styles, rc, color_theme
 from src.layout import header, history, statistics, balance
 from src.layout import make
 from src.layout.log import tradinglog
@@ -115,7 +115,7 @@ LAYOUT = html.Div(
                 ),
             ],
             style={
-                "backgroundColor": styles.color_theme.table_bg_main
+                "backgroundColor": color_theme.table_bg_main
             }
         ),
         html.Div(

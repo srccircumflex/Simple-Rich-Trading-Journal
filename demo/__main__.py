@@ -10,5 +10,5 @@ import main
 
 if __name__ == "__main__":
     demo.init(demo.ID)
-    main.__project_name__ = f"(demo){demo.ID} {main.__project_name__}"
+    main.PROJECT = f"(demo){demo.ID} {main.__project_name__}"
     main.run()

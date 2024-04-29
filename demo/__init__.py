@@ -7,17 +7,17 @@ import src
 
 from pathlib import Path
 
-from demo import make
+from . import make
 
 ID = ""
 ROOT = sub("[^/\\\\]+$", "", __file__)
 CACHE_ROOT = ROOT + "/"
-_CACHE_TRADINGLOG = CACHE_ROOT + "/demo-%s-tradinglog.pickle"
-_CACHE_TRADINGLOG_HISTORY = CACHE_ROOT + "/demo-%s-tradinglog-history.pickle"
+_CACHE_TRADINGLOG = CACHE_ROOT + "/demo-%s-tradinglog.pkl"
+_CACHE_TRADINGLOG_HISTORY = CACHE_ROOT + "/demo-%s-tradinglog-history.pkl"
 CACHE_TRADINGLOG = _CACHE_TRADINGLOG
 CACHE_TRADINGLOG_HISTORY = _CACHE_TRADINGLOG_HISTORY
 
-DEMO_BU = CACHE_ROOT + "/~demo--tradinglog.pickle."
+DEMO_BU = CACHE_ROOT + "/~demo--tradinglog.pickle"
 
 
 def init(id_: str):

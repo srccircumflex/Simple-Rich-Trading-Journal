@@ -1,6 +1,6 @@
 import dash_ag_grid as dag
 
-from src.config import styles, rc
+from src.config import rc, color_theme
 from src.config.functional import log_columns
 
 __debug = 0
@@ -263,7 +263,7 @@ tradinglog = dag.AgGrid(
     defaultColDef=_default_col_def,
     dashGridOptions=_dashGridOptions,
     getRowId="params.data.id",
-    className=styles.color_theme.table_theme + " ag-alt-colors",
+    className=color_theme.table_theme + " ag-alt-colors",
     dangerously_allow_code=True,
     style={
         "height": "100%",
