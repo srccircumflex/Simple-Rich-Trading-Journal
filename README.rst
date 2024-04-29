@@ -7,7 +7,7 @@ Simple Rich Trading Protocol
 ============================
 
 
-.. image:: ./_doc/main.png
+.. image:: ./.repo.doc/main.png
     :align: center
 
 0.1 #1 (2024-04-29)
@@ -95,7 +95,7 @@ General information
 
 Trades
 ------
-.. image:: ./_doc/trade_open.png
+.. image:: ./.repo.doc/trade_open.png
     :align: center
 
 Enter a value greater than ``0`` in the column *n* and define the cells of the columns
@@ -106,19 +106,19 @@ If a value is entered in *TakeAmount* or *TakeCourse* but not in *TakeTime*, the
 is still considered to be open, the *Profit* and *Performance* cell is calculated and,
 if ``with open`` is active, also the summary footer and a visible side section.
 
-.. image:: ./_doc/trade_open_with_take.png
+.. image:: ./.repo.doc/trade_open_with_take.png
     :align: center
 
 A trade is considered finalized if *TakeTime* is also defined.
 
-.. image:: ./_doc/trade_fin.png
+.. image:: ./.repo.doc/trade_fin.png
     :align: center
 
 Another way to close positions is to give the log a closing instruction.
 This can also be used to close several individual positions at once or to close individual
 positions only partially.
 
-.. image:: ./_doc/close_cmd.png
+.. image:: ./.repo.doc/close_cmd.png
     :align: center
 
 To do this, enter the appropriate *Name*, a negative number *n*, the *TakeTime*
@@ -126,7 +126,7 @@ and the *TakeAmount* or *TakeCourse* in a free row.
 
 Deposits
 --------
-.. image:: ./_doc/deposit.png
+.. image:: ./.repo.doc/deposit.png
     :align: center
 
 Enter a ``0`` in the column *n* and define the cells of the columns *InvestTime* and
@@ -141,12 +141,12 @@ Entries in the column group *Take* are not accepted, these are defined by the pr
 based on following payouts. Once the amount has been exhausted, the deposit record
 will no longer receive a profit value from that point on.
 
-.. image:: ./_doc/deposit_ex.png
+.. image:: ./.repo.doc/deposit_ex.png
     :align: center
 
 Payouts
 -------
-.. image:: ./_doc/payout.png
+.. image:: ./.repo.doc/payout.png
     :align: center
 
 Enter a ``0`` in the column *n* and define the cells of the columns *TakeTime* and
@@ -162,7 +162,7 @@ The value in *Performance* represents the rate to the sum of previous deposits.
 
 Dividends
 ---------
-.. image:: ./_doc/dividend.png
+.. image:: ./.repo.doc/dividend.png
     :align: center
 
 For a dividend record it is important to enter a *Name* first, then enter a ``0`` in
@@ -180,13 +180,13 @@ A trade belongs to the dividend if the *Name* is identical and it is open at the
 dividend. The *Dividend* column of these associated trades is calculated in proportion to the
 *InvestAmount*.
 
-.. image:: ./_doc/dividend_at_trade.png
+.. image:: ./.repo.doc/dividend_at_trade.png
     :align: center
 
 
 Interests, Taxes and other Costs or Income (ITC)
 ------------------------------------------------
-.. image:: ./_doc/itc.png
+.. image:: ./.repo.doc/itc.png
     :align: center
 
 Enter a ``0`` in the column *n* and define the cell of the column *ITC* and
