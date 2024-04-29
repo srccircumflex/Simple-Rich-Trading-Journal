@@ -108,3 +108,5 @@ cellRendererChangeProfit: Literal[0, 1] = 1
 # misc
 startupFlushOpenTakeAmount: Literal[0, 1] = 1
 useDefaultAltColors: Literal[0, 1] = 0  # So far, this only affects the columns `Performance` and `Profit`
+disableCopyPaste: Literal[0, 1] = 0
+disableFooterLifeSignal: Literal[0, 1] = 1
