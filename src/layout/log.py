@@ -64,6 +64,7 @@ _columns_ = [
                 "field": "InvestTime",
                 "headerName": "Time",
                 "filter": "agDateColumnFilter",
+                "comparator": {"function": "dateOrderComparator"},
                 "filterParams": {
                     "comparator": {"function": "dateFilterComparator"},
                     "buttons": ["clear"],
@@ -102,6 +103,7 @@ _columns_ = [
                 "field": "TakeTime",
                 "headerName": "Time",
                 "filter": "agDateColumnFilter",
+                "comparator": {"function": "dateOrderComparator"},
                 "filterParams": {
                     "comparator": {"function": "dateFilterComparator"},
                     "buttons": ["clear"],

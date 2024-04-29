@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from re import search
 
-from src.config import time_formats
+from src.config import time_formats, rc
 
 
 def tradetimeparser(spec: str):
@@ -29,14 +29,14 @@ def tradetimeparser(spec: str):
             date = datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)), int(m.group(4)), int(m.group(5)))
         else:
             raise ValueError("FormatError: %r" % spec)
-        return date.strftime(time_formats.transaction_time_format)
+        return date.strftime(rc.transactionTimeFormat)
     else:
         return ""
 
 
 def datetime_from_tradetimeformat(spec: str, default=None):
     try:
-        return datetime.strptime(spec, time_formats.transaction_time_format)
+        return datetime.strptime(spec, rc.transactionTimeFormat)
     except (ValueError, TypeError):
         return default
 

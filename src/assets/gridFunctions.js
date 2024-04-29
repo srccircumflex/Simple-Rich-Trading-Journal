@@ -8,9 +8,9 @@ dagfuncs.dateFilterComparator = (filterLocalDateAtMidnight, cellValue) => {
 
     // transaction_time_format = "%d/%m/%y %H:%M"
     const dateParts = cellValue.split(" ")[0].split("/");
-    const year = Number("20" + dateParts[2]);
-    const month = Number(dateParts[1]) - 1;
-    const day = Number(dateParts[0]);
+    const year = Number("20" + dateParts[dateFormat.indexOf("y")]);
+    const month = Number(dateParts[dateFormat.indexOf("m")]) - 1;
+    const day = Number(dateParts[dateFormat.indexOf("d")]);
     const cellDate = new Date(year, month, day);
 
     if (cellDate < filterLocalDateAtMidnight) {
@@ -19,6 +19,30 @@ dagfuncs.dateFilterComparator = (filterLocalDateAtMidnight, cellValue) => {
         return 1;
     }
     return 0;
+};
+
+dagfuncs.dateOrderComparator = (date1, date2) => {
+    if (!date1 && !date2) {
+        return 0;
+    }
+    if (!date1) {
+        return -1;
+    }
+    if (!date2) {
+        return 1;
+    }
+
+    function p (date) {
+        timeParts = date.split(" ");
+        dateParts = timeParts[0].split("/");
+        HM = timeParts[1].split(":");
+        year = Number("20" + dateParts[dateFormat.indexOf("y")]);
+        month = Number(dateParts[dateFormat.indexOf("m")]) - 1;
+        day = Number(dateParts[dateFormat.indexOf("d")]);
+        return new Date(year, month, day, Number(HM[0]), Number(HM[1]));
+    }
+
+    return p(date1) - p(date2);
 };
 
 dagfuncs.timedeltaParser = (value) => {

@@ -19,7 +19,7 @@ PICKLE_PROTOCOL = pickle.HIGHEST_PROTOCOL
 
 def init():
     global INIT_DATA, HISTORY_DATA, HISTORY_KEYS_X_TIME_REVSORT, LAST_HISTORY_CREATION_TIME
-    __firstrun = [{"id": 0, "n": 0, "InvestTime": datetime.now().strftime(time_formats.transaction_time_format), "InvestAmount": 1}]
+    __firstrun = [{"id": 0, "n": 0, "InvestTime": datetime.now().strftime(rc.transactionTimeFormat), "InvestAmount": 1}]
     try:
         with open(CACHE_TRADINGLOG, "rb") as __f:
             INIT_DATA = pickle.load(__f)

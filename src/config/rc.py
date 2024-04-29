@@ -9,12 +9,18 @@ except ImportError:
 from .. import ROOT, CACHE_COLORS
 from . import color_theme
 
+
+dateFormat = {"ISO 8601": "ydm", "american": "mdy", "international": "dmy"}.get(dateFormat, dateFormat)
+transactionTimeFormat = {"ydm": "%y/%d/%m %H:%M", "mdy": "%m/%d/%y %H:%M", "dmy": "%d/%m/%y %H:%M"}[dateFormat]
+
 with open(ROOT + "/assets/rc.js", "w") as f:
     f.write(
         "// [do not change] this file is created by `rc'\n"
         f"const {gridDefWidthScale=};"
         f"const {gridMinWidthScale=};"
         f"const {gridRow3Height=};"
+        f"const {dateFormat=};"
+        f"const {transactionTimeFormat=};"
     )
 
 with open(ROOT + "/assets/rc.css", "w") as f:
