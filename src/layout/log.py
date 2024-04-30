@@ -255,8 +255,9 @@ _default_col_def = {
 _dashGridOptions = {
     "dataTypeDefinitions": log_columns.dataTypeDefinitions,
     "tooltipShowDelay": 0,
-    "undoRedoCellEditing": True,
-    "undoRedoCellEditingLimit": 20,
+    # todo (does not seem to work when the grid is edited with row transaction)
+    # "undoRedoCellEditing": True,
+    # "undoRedoCellEditingLimit": 20,
 }
 
 tradinglog = dag.AgGrid(
