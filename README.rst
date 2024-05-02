@@ -2,9 +2,9 @@
 .. role:: html(raw)
    :format: html
 
-============================
-Simple Rich Trading Protocol
-============================
+===========================
+Simple Rich Trading Journal
+===========================
 
 
 .. image:: ./.repo.doc/main.png
