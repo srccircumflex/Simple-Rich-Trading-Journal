@@ -11,7 +11,7 @@ Simple Rich Trading Journal
     :align: center
 
 0.2 #1 (2024-05-05)
-    | |Autocompletion|_ **implemented**
+    | Autocompletion_ implemented
     | *The project is still being worked on and some scenarios have not been tested.*
 
  The project was realized with the opensource packages from plotly_ ✨.
@@ -309,7 +309,7 @@ Old Versions
 ============
 
 0.1 #1 (2024-04-29)
-        Initial Commit
+    Initial Commit
 
 
 .. _plotly: https://plotly.com/
@@ -317,5 +317,4 @@ Old Versions
 .. _rconfig.py: ./rconfig.py
 .. _plugin.init_log: ./plugin/__init__.py#L22
 .. _plugin/__init__.py: ./plugin/__init__.py
-.. |Autocompletion| replace:: **Autocompletion**
 .. _Autocompletion: #autocompletion
