@@ -211,6 +211,8 @@ Additional Features
 Amount Calculation
 ------------------
 
+You can enter arithmetic formulas in amount cells.
+
 Supported operants and syntax:
     ============ ==============================================
     ``+``        addition
