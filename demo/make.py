@@ -140,7 +140,6 @@ def randrate2():
     return randint(30, 4_90) / 100_00
 
 
-
 def make():
     class _Money:
         cash = 0.0

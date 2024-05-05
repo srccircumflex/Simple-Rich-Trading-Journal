@@ -411,6 +411,10 @@ class LogCalc:
 
     _cached_props: tuple[str, ...]
 
+    _names: set[str]
+    _symbols: set[str]
+    _types: set[str]
+
     def __init__(
             self,
             log_data: list[dict],
@@ -427,6 +431,9 @@ class LogCalc:
         self.__mainFrame__ = self
         self._index_by_take_date = False
         self._calc_with_open_positions = False
+        self._names = set()
+        self._symbols = set()
+        self._types = set()
 
     def __len__(self):
         return sum(map(len, (self._deposits, self._payouts, self._fin_trades, self._open_trades, self._undefined, self._dividends, self._itcs)))
@@ -671,6 +678,17 @@ class LogCalc:
         self._undefined = list()
         self._dividends = list()
         self._itcs = list()
+        self._names = set()
+        self._symbols = set()
+        self._types = set()
+
+        def add_ids(__o, __i):
+            if i := __o.row_dat.get("Name"):
+                __i._names.add(i)
+            if i := __o.row_dat.get("Symbol"):
+                __i._symbols.add(i)
+            if i := __o.row_dat.get("Type"):
+                __i._types.add(i)
 
         def ea_undefined(__o, __i):
             if not __o._do_flush():
@@ -684,12 +702,15 @@ class LogCalc:
 
         def ea_fin_trades(__o, __i):
             __i._fin_trades.append(__o)
+            add_ids(__o, __i)
 
         def ea_open_trades(__o, __i):
             __i._open_trades.append(__o)
+            add_ids(__o, __i)
 
         def ea_dividends(__o, __i):
             __i._dividends.append(__o)
+            add_ids(__o, __i)
 
         def ea_itcs(__o, __i):
             __i._itcs.append(__o)

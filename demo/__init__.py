@@ -2,7 +2,7 @@ from re import sub
 from sys import argv
 
 import plugin
-import rconfig as rc
+import src.config.rc as rc
 import src
 
 from pathlib import Path

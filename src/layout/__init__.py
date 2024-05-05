@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 
 from src.config import styles, rc, color_theme
-from src.layout import header, history, statistics, balance
+from src.layout import header, history, statistics, balance, autocomplet
 from src.layout import make
 from src.layout.log import tradinglog
 
@@ -175,6 +175,7 @@ LAYOUT = html.Div(
                       "bottom": 0,
                   } | styles.misc.summary_footer
         ),
-        init_trigger := html.Div(id="init_trigger_")
+        init_trigger := html.Div(id="init_trigger_"),
+        autocomplet.COMPONENTS
     ]
 )

@@ -1,4 +1,3 @@
-from . import *
 from re import sub
 
 ROOT = sub("[^/\\\\]+$", "", __file__)

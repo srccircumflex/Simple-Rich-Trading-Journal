@@ -10,8 +10,14 @@ Simple Rich Trading Journal
 .. image:: ./.repo.doc/main.png
     :align: center
 
-0.1 #1 (2024-04-29)
-    The project is still being worked on and some scenarios have not been tested.
+0.2 #1 (2024-05-05)
+    | |Autocompletion|_ **implemented**
+    | *The project is still being worked on and some scenarios have not been tested.*
+
+ The project was realized with the opensource packages from plotly_ ✨.
+
+ :html:`<p xmlns:cc="http://creativecommons.org/ns#" >This work is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>`
+
 
 Install and Run
 ===============
@@ -199,42 +205,13 @@ Entries in the columns *InvestAmount* or *TakeAmount* are not accepted.
 The value in *Performance* represents the rate to the sum of previous deposits.
 
 
-Nice to know
-============
+Additional Features
+===================
 
-- The project has so far only been tested on ``Mozilla Firefox 125.0.2`` on Linux.
+Amount Calculation
+------------------
 
-- Before the log is (further) edited, large calculations should be completed.
-
-- When calculations are running, ``working...`` is displayed in the tab label.
-
-- The log is recalculated when a defined record is detected or changed.
-
-- Reload the page to reorder all the records.
-
-- Copy/paste functions are implemented but still buggy.
-
-    | Supported actions:
-    ======================== ===========================================================
-    ctrl+c                   write a cell content to the clipboard.
-    ctrl+x                   write a cell content to the clipboard and delete it from the log.
-    ctrl+a, ctrl+y, ctrl+z   write a row to the clipboard.
-    ctrl+shift+x             write a row to the clipboard and delete it from the log.
-    ctrl+v                   insert the content (if the insertion does not work, move the cursor to another cell and back again and try again).
-    ======================== ===========================================================
-
-    Until now, the entire log has been recalculated after insertion, which may take more computing time than simply editing a cell.
-
-    Currently, the following error may occur temporarily, which leads to the copy function being blocked:
-    ``Uncaught (in promise) DOMException: Clipboard write was blocked due to lack of user activation.``
-
-    The feature can be disabled in :html:`<a href="./rconfig.py#L111">rconfig.py</a>`.
-
-- Confirm an entry in *InvestAmount* or *TakeAmount* with Enter, **not with Tap** (BUG).
-
-- Formulas can be entered in amount cells to calculate the amount.
-
-    | Supported operants and syntax:
+Supported operants and syntax:
     ============ ==============================================
     ``+``        addition
     ``-``        subtraction
@@ -250,6 +227,62 @@ Nice to know
     ``1.000,1``  non-english thousands and decimal separator
     ``1,000.1``  english thousands and decimal separator
     ============ ==============================================
+
+
+Copy/Paste
+----------
+
+Functions are implemented but still buggy.
+
+Supported actions:
+    ======================== ===========================================================
+    ctrl+c                   write a cell content to the clipboard.
+    ctrl+x                   write a cell content to the clipboard and delete it from the log.
+    ctrl+a, ctrl+y, ctrl+z   write a row to the clipboard.
+    ctrl+shift+x             write a row to the clipboard and delete it from the log.
+    ctrl+v                   insert the content (if the insertion does not work, move the cursor to another cell and back again and try again).
+    ======================== ===========================================================
+
+Until now, the entire log has been recalculated after insertion, which may take more computing time than simply editing a cell.
+
+Currently, the following error may occur temporarily, which leads to the copy function being blocked:
+``Uncaught (in promise) DOMException: Clipboard write was blocked due to lack of user activation.``
+
+The feature can be disabled in :html:`<a href="./rconfig.py#L111">rconfig.py</a>`.
+
+
+Autocompletion
+--------------
+ (since v0.2)
+
+An autocomplete interface is available for the *Name*, *Symbol* and *Type* column.
+Use the key combination ``ctrl+space`` while one of these cells is in focus.
+
+.. image:: ./.repo.doc/autoc.png
+    :align: center
+
+The interface searches for similar entries in the column based on the cell value.
+If the cell is empty, press the ``down-arrow`` after calling up the interface.
+Click on an entry or select it with ``Enter``. Click anywhere else or press ``Escape``
+to close the interface without confirming.
+
+The pool is always created when the page is loaded and is not expanded during editing.
+
+
+Nice to know
+============
+
+- The project has so far only been tested on ``Mozilla Firefox 125.0.2`` on Linux.
+
+- Before the log is (further) edited, large calculations should be completed.
+
+- When calculations are running, ``working...`` is displayed in the tab label.
+
+- The log is recalculated when a defined record is detected or changed.
+
+- Reload the page to reorder all the records.
+
+- Confirm an entry in *InvestAmount* or *TakeAmount* with Enter, **not with Tap** (BUG).
 
 - Side sections are only calculated if they are visible. If many edits are made, they should be hidden.
 
@@ -271,14 +304,18 @@ Nice to know
 
 - Debug by reloading the page.
 
-----
 
- The project was realized with the opensource packages from plotly_.
+Old Versions
+============
 
- :html:`<p xmlns:cc="http://creativecommons.org/ns#" >This work is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>`
+0.1 #1 (2024-04-29)
+        Initial Commit
+
 
 .. _plotly: https://plotly.com/
 .. _Python interpreter: https://www.python.org/
 .. _rconfig.py: ./rconfig.py
 .. _plugin.init_log: ./plugin/__init__.py#L22
 .. _plugin/__init__.py: ./plugin/__init__.py
+.. |Autocompletion| replace:: **Autocompletion**
+.. _Autocompletion: #autocompletion

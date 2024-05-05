@@ -760,3 +760,41 @@ def scopes_check(scopes):
 )
 def quick_search(val, opt):
     return opt | {"quickFilterText": val}
+
+
+@callback(
+    Output(layout.autocomplet.autocdropdown, "options"),
+    Input(layout.autocomplet.autocdropdown, "search_value"),
+    Input(layout.autocomplet.autoctrigger, "value"),
+    config_prevent_initial_callbacks=True
+)
+def autoc_enter(search_val, trigger):
+    trigger = loads(trigger)
+    match trigger["_col"]:
+        case "Name":
+            opts = __lc__.__mainFrame__._names
+        case "Symbol":
+            opts = __lc__.__mainFrame__._symbols
+        case "Type":
+            opts = __lc__.__mainFrame__._types
+        case _:
+            return no_update
+
+    opts = [{"label": i, "value": i} for i in opts]
+
+    return opts
+
+
+def autoc_exit():
+    # sync column styles
+    clientside_callback(
+        """function (value) {
+            window.dash_clientside.clientside.autocomplete(value)
+            return null
+        }""",
+        Output(layout.autocomplet.autocdropdown, "value"),
+        Input(layout.autocomplet.autocdropdown, "value"),
+    )
+
+
+autoc_exit()

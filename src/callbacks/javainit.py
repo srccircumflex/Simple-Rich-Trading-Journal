@@ -10,6 +10,7 @@ clientside_callback(
         if (!%d) {
             window.dash_clientside.clientside.make_copypaste();
         }
+        window.dash_clientside.clientside.make_autocomplete();
         return window.dash_clientside.no_update
     }""" % rc.disableCopyPaste,
     # ClientsideFunction(namespace="clientside", function_name="make"),

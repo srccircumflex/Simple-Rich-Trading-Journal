@@ -92,3 +92,19 @@
     overflow: hidden;
 }
 /* < misc */
+
+/* autocomplete > */
+.autocdropdown > .Select-control {
+	height: 0px !important;
+	font-size: 0px !important;
+	overflow: hidden;
+}
+.autocdropdown > .Select-control > .Select-multi-value-wrapper > .Select-input {
+	height: 0px !important;
+	font-size: 0px !important;
+}
+.autocdropdown > .Select-menu-outer {
+    font-size: 13px
+    color: black;
+}
+/* < autocomplete */
