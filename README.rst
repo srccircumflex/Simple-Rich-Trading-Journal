@@ -348,7 +348,7 @@ Markdown and LaTeX Mathematics
 The note interface supports most expressions of the `Markdown language`_, see the
 `Markdown Guide`_ for an introduction.
 
-In addition, the rendering of `LaTeX/Mathematics`_ can be activated in `rconfig.py`_ (`noteMathJax`_).
+In addition, the rendering of `LaTeX/Mathematics`_ can be activated by `noteMathJax`_.
 In the document, the sections that are written in the language must then be delimited by the
 character strings ``$$``. Due to the inclusion of various functions, the doubling should
 also be used for the inline expression, even if the original documentation provides for a simple ``$``.
