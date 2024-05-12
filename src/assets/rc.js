@@ -1,2 +1,2 @@
 // [do not change] this file is created by `rc'
-const gridDefWidthScale=0.2;const gridMinWidthScale=0.1;const gridRow3Height=120;const dateFormat='dmy';
+const gridDefWidthScale=0.2;const gridMinWidthScale=0.1;const gridRow3Height=120;const dateFormat='dmy';const ccCopy = 'KeyC';const ccCut = 'KeyX';const ccPaste = 'KeyV';const ccCopyRow1 = 'KeyA';const ccCopyRow2 = 'KeyY';const ccCopyRow3 = 'KeyZ';const ccAComplete = 'Space';const ccNote = 'KeyI';const ccNoteBack = 'Backslash';const noteCellVariableFormatter=1;const noteUnifying=1;const noteLinkDropPattern=/^(https?:\/\/|www\.)/;const notePathDropPattern=/^(\/|[A-Z]:\\)/;

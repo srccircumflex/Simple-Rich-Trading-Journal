@@ -11,3 +11,20 @@
   background-color: rgb(218, 230, 247) !important;
 }
 /* < dataTable hover bg */
+
+/* notepaper > */
+.notepaper a {
+  color: blue !important;
+}
+/* < notepaper */
+
+/* note editor > */
+.CodeMirror {
+  height: 100%;
+  width: 100%;
+  background-color: #ffffffdd;
+}
+.CodeMirror-gutters {
+  background-color: #f7f7f7;
+}
+/* < note editor */

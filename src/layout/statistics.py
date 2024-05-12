@@ -200,7 +200,7 @@ STATISTICS = html.Div([
                     html.Div([
                         drag_container := html.Div(
                             _dragcontainer,
-                            id="drag_container_",
+                            id="dragContainer",
                             style={
                                 "display": "inline-block",
                                 "width": "2%",

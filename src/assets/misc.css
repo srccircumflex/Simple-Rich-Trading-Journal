@@ -108,3 +108,12 @@
     color: black;
 }
 /* < autocomplete */
+
+/* noteeditor > */
+div.CodeMirror span.CodeMirror-matchingbracket {
+  color: red;
+  font-weight: bold;
+  text-decoration: underline black;
+  background: #1c1c1c24;
+}
+/* < noteeditor */

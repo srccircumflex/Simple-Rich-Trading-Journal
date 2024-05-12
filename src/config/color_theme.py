@@ -107,5 +107,34 @@ sheet_cell_active_bg = "#cce0ff"
 sheet_cell_selected_bg = "#cce0ff"
 sheet_hover_bg = "rgb(218, 230, 247)"
 
+# /log/alt colors
 alt_neg = "rgb(200, 0, 200)"
 alt_pos = "rgb(200, 200, 0)"
+
+
+# since v0.3 >
+
+
+# /notepaper
+notepaper_bg = "#ffffff"
+notepaper_def_transparency = "ce"
+notepaper_fg = "#000000"
+notepaper_border = "#ddd"
+notepaper_link = "blue"
+
+# /noteeditor
+notebook_bg = "#ffffff"
+notebook_def_transparency = "dd"
+notebook_gutter_bg = "#f7f7f7"
+notebook_def_gutter_transparency = ""  # "89"
+
+# /noteeditor/dialog
+noteeditor_dialog_fg = "black"
+noteeditor_dialog_bg = "wheat"
+noteeditor_dialog_border = "red"
+noteeditor_dialog_ignore = "#ffffff47"
+noteeditor_dialog_rename = "#0ad57f47"
+noteeditor_dialog_overwrite = "#d50a0a61"
+
+
+# <  since v0.3

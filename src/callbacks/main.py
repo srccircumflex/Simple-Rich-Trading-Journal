@@ -8,15 +8,14 @@ from time import perf_counter
 from traceback import print_exception
 
 import plotly.graph_objects as go
-from dash import callback, Output, Input, State, no_update, clientside_callback
+from dash import callback, Output, Input, State, no_update
 from dash import callback_context
 
+import plugin
 from src import cache, layout
 from src.calc.log import LogCalc, TradeFrameCalc
 from src.calc.utils import do_add_row
 from src.config import styles, rc
-
-import plugin
 
 __lc__: LogCalc | TradeFrameCalc
 
@@ -97,6 +96,7 @@ def new_side(
     Output(layout.header.scope_by_button, "children"),
     Output(layout.header.update_interval, "disabled", allow_duplicate=True),
     Output(layout.header.update_interval_trigger, "n_clicks"),
+    Output(layout.init_done_trigger, "n_clicks"),
     ##############################################################################################
     Input(layout.init_trigger, "n_clicks"),
     Input(layout.header.update_interval_trigger, "n_clicks"),
@@ -227,6 +227,7 @@ def call(
     o_scope_by_button_children = no_update
     o_update_interval_disabled = no_update
     o_update_interval_trigger_n_clicks = no_update
+    o_init_done_trigger_n_clicks = no_update
 
     i_STATISTICS_style = not i_STATISTICS_style.get("display")
     i_BALANCE_style = not i_BALANCE_style.get("display")
@@ -299,6 +300,7 @@ def call(
             o_scope_by_button_children,
             o_update_interval_disabled,
             o_update_interval_trigger_n_clicks,
+            o_init_done_trigger_n_clicks,
         )
 
     def set_auto_save(on: int):
@@ -393,6 +395,7 @@ def call(
             plugin.course_call = _course_call
             o_backup_list_options = layout.make.make_history_list(cache.HISTORY_KEYS_X_TIME_REVSORT)
             o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
+            o_init_done_trigger_n_clicks = 1
 
         # index by
         elif __trigger__ == layout.header.index_by_button.id:
@@ -675,25 +678,6 @@ def course_update(
     )
 
 
-def sync_column_styles():
-    # sync column styles
-    clientside_callback(
-        """async function (nClicks) {
-            gridApi = await dash_ag_grid.getApiAsync(%r);
-            function refresh () {
-                gridApi.refreshCells({force: true, columns: ['Name', 'n', 'InvestTime', 'InvestAmount', 'InvestCourse', 'TakeTime', 'TakeAmount', 'TakeCourse', 'ITC', 'Profit', 'Performance', 'Dividend']});
-            }
-            refresh();
-            setTimeout(refresh, 1);
-            return window.dash_clientside.no_update
-        }""" % (layout.tradinglog.id,),
-        Output(layout.tradinglog, 'id'),
-        Input(layout.renderer_trigger, 'n_clicks'),
-    )
-
-
-sync_column_styles()
-
 _pre_scopes = set()
 _pre_scopes_t = 0
 _pre_scopes_d = ""
@@ -783,18 +767,3 @@ def autoc_enter(search_val, trigger):
     opts = [{"label": i, "value": i} for i in opts]
 
     return opts
-
-
-def autoc_exit():
-    # sync column styles
-    clientside_callback(
-        """function (value) {
-            window.dash_clientside.clientside.autocomplete(value)
-            return null
-        }""",
-        Output(layout.autocomplet.autocdropdown, "value"),
-        Input(layout.autocomplet.autocdropdown, "value"),
-    )
-
-
-autoc_exit()

@@ -363,7 +363,7 @@ Dividend = {
 }
 
 Note = {
-    'cellStyle': {} | note,
+    'cellStyle': {"white-space": "pre"} | note,
     "width": rc.logColWidths[14],
     "hide": not rc.logColWidths[14]
 }

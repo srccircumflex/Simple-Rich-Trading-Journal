@@ -3,7 +3,7 @@ from dash import html, dcc
 from src.config import rc
 
 autocdropdown = dcc.Dropdown(
-    id="autocdropdown_",
+    id="autoCDropdown",
     style={
         "position": "absolute",
         "zIndex": -1,
@@ -15,7 +15,7 @@ autocdropdown = dcc.Dropdown(
     className="autocdropdown"
 )
 
-autoctrigger = dcc.Input(id="autoctrigger_", style={"display": "none"})
+autoctrigger = dcc.Input(id="autoCTrigger", style={"display": "none"})
 
 COMPONENTS = html.Div([
     autocdropdown,

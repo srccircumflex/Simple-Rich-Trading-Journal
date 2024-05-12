@@ -1,1 +1,1 @@
-from . import log, misc, figures, balance
+from . import log, misc, figures, balance, note

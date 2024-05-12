@@ -25,7 +25,21 @@ with open(ROOT + "/assets/rc.js", "w") as f:
         f"const {gridMinWidthScale=};"
         f"const {gridRow3Height=};"
         f"const {dateFormat=};"
+        f"const ccCopy = {bindKeyCodes[0]!r};"
+        f"const ccCut = {bindKeyCodes[1]!r};"
+        f"const ccPaste = {bindKeyCodes[2]!r};"
+        f"const ccCopyRow1 = {bindKeyCodes[3]!r};"
+        f"const ccCopyRow2 = {bindKeyCodes[4]!r};"
+        f"const ccCopyRow3 = {bindKeyCodes[5]!r};"
+        f"const ccAComplete = {bindKeyCodes[6]!r};"
+        f"const ccNote = {bindKeyCodes[7]!r};"
+        f"const ccNoteBack = {bindKeyCodes[8]!r};"
+        f"const {noteCellVariableFormatter=};"
+        f"const {noteUnifying=};"
+        f"const noteLinkDropPattern=/{noteLinkDropPattern}/;"
+        f"const notePathDropPattern=/{notePathDropPattern}/;"
     )
+
 
 with open(ROOT + "/assets/rc.css", "w") as f:
     cont = "/* [do not change] this file is created by `rc' */\n"
@@ -52,6 +66,29 @@ with open(ROOT + "/assets/rc.css", "w") as f:
 }
 /* < dataTable hover bg */
 """ % color_theme.sheet_hover_bg
+    cont += """
+/* notepaper > */
+.notepaper a {
+  color: %s !important;
+}
+/* < notepaper */
+""" % color_theme.notepaper_link
+    cont += """
+/* note editor > */
+.CodeMirror {
+  height: 100%%;
+  width: 100%%;
+  background-color: %s;
+}
+.CodeMirror-gutters {
+  background-color: %s;
+}
+/* < note editor */
+""" % (
+        color_theme.notebook_bg + (color_theme.notebook_def_transparency if noteEditorDefaultTransparency else ""),
+        color_theme.notebook_gutter_bg + (color_theme.notebook_def_gutter_transparency if noteEditorDefaultTransparency else ""),
+    )
+
     f.write(cont)
 
 if statisticsIdBySymbol:

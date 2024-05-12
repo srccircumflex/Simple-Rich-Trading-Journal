@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 
 from src.config import styles, rc, color_theme
-from src.layout import header, history, statistics, balance, autocomplet
+from src.layout import header, history, statistics, balance, autocomplet, note
 from src.layout import make
 from src.layout.log import tradinglog
 
@@ -71,7 +71,7 @@ LAYOUT = html.Div(
                                     } | styles.misc.header
                                 ),
                             ],
-                            id="r-1"
+                            id="gridR1"
                         ),
                         html.Div(
                             [
@@ -79,7 +79,7 @@ LAYOUT = html.Div(
                                     [
                                         tradinglog,
                                     ],
-                                    id="c-1",
+                                    id="gridC1",
                                     className="col-div col-div-flex border-div",
                                     style={
                                         "width": rc.c1Width,
@@ -87,7 +87,7 @@ LAYOUT = html.Div(
                                     }
                                 ),
                                 split_handle := html.Div(
-                                    id="split-handle",
+                                    id="gridSplitter",
                                     style={
                                         "height": "inherit",
                                     } | (styles.misc.balance_split_handle if rc.sideInitBalance else styles.misc.statistics_split_handle),
@@ -98,7 +98,7 @@ LAYOUT = html.Div(
                                         statistics.STATISTICS,
                                         balance.BALANCE
                                     ],
-                                    id="c-2",
+                                    id="gridC2",
                                     className="col-div col-div-flex border-div",
                                     style={
                                         "width": rc.c2Width,
@@ -106,7 +106,7 @@ LAYOUT = html.Div(
                                     }
                                 )
                             ],
-                            id="r-2",
+                            id="gridR2",
                             style={
                                 "display": "flex"
                             }
@@ -122,8 +122,8 @@ LAYOUT = html.Div(
             [
                 renderer_trigger := html.Div(id="style_trigger_", n_clicks=0),
                 c2Hide_trigger := html.Div(id="c2Hide_trigger_", n_clicks=0),
-                drag_event_receiver := dbc.Input(type="text", id="drag_event_receiver_", style={'visibility': 'hidden', "display": "none"}),
-                edit_event_receiver := dbc.Input(type="text", id="edit_event_receiver_", style={'visibility': 'hidden', "display": "none"}),
+                drag_event_receiver := dbc.Input(type="text", id="dragEventReceiver", style={'visibility': 'hidden', "display": "none"}),
+                edit_event_receiver := dbc.Input(type="text", id="editEventReceiver", style={'visibility': 'hidden', "display": "none"}),
                 history.MODAL,
                 statistics.POP,
                 statistics.SETTINGS,
@@ -157,7 +157,7 @@ LAYOUT = html.Div(
                     }
                 ),
             ],
-            id="bb",
+            id="bottomBar",
             style={
                 "position": "absolute",
                 "bottom": rc.bottomBarDistanceBottom,
@@ -168,7 +168,7 @@ LAYOUT = html.Div(
             }
         ),
         summary_footer := html.Div(
-            id="r-3",
+            id="gridR3",
             style={
                       "width": "100%",
                       "position": "absolute",
@@ -176,6 +176,8 @@ LAYOUT = html.Div(
                   } | styles.misc.summary_footer
         ),
         init_trigger := html.Div(id="init_trigger_"),
-        autocomplet.COMPONENTS
+        init_done_trigger := html.Div(id="init_done_trigger_"),
+        autocomplet.COMPONENTS,
+        note.COMPONENTS,
     ]
 )

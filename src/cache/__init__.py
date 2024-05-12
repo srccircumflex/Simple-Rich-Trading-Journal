@@ -3,8 +3,11 @@ from __future__ import annotations
 import pickle
 from time import time
 from datetime import datetime
+from os import mkdir, listdir, remove
+from urllib.parse import unquote
+from re import finditer
 
-from src import CACHE_TRADINGLOG, CACHE_TRADINGLOG_HISTORY
+from src import CACHE_TRADINGLOG, CACHE_TRADINGLOG_HISTORY, FILE_CLONES, FILE_CLONES_FLUSH_TIMESTAMP, FILE_CLONES_TRASH
 from src.config import rc
 import plugin
 
@@ -20,18 +23,76 @@ PICKLE_PROTOCOL = pickle.HIGHEST_PROTOCOL
 def init():
     global INIT_DATA, HISTORY_DATA, HISTORY_KEYS_X_TIME_REVSORT, LAST_HISTORY_CREATION_TIME
     __firstrun = [{"id": 0, "n": 0, "InvestTime": datetime.now().strftime(rc.timeFormatTransaction), "InvestAmount": 1}]
+    t = int(time())
     try:
+        print("[ INIT ]/journal load:", CACHE_TRADINGLOG)
         with open(CACHE_TRADINGLOG, "rb") as __f:
             INIT_DATA = pickle.load(__f)
     except FileNotFoundError:
+        print("[ INIT ]/journal first run:", __firstrun)
         INIT_DATA = __firstrun
         dump_log(INIT_DATA)
     try:
+        print("[ INIT ]/history load:", CACHE_TRADINGLOG_HISTORY)
         with open(CACHE_TRADINGLOG_HISTORY, "rb") as __f:
             HISTORY_DATA = pickle.load(__f)
     except FileNotFoundError:
+        print("[ INIT ]/history first run:", __firstrun)
         HISTORY_DATA = {i: {"time": i, "data": __firstrun} for i in range(rc.nHistorySlots)}
 
+    try:
+        print("[ INIT ]/file-clones/flush load:", FILE_CLONES_FLUSH_TIMESTAMP)
+        with open(FILE_CLONES_FLUSH_TIMESTAMP) as __f:
+            timestamp = int(__f.read())
+        if timestamp + rc.noteFileDropClonerFlushIntervalS < t:
+            print("[ INIT ]/file-clones/flush start")
+            with open(FILE_CLONES_FLUSH_TIMESTAMP, "w") as __f:
+                __f.write(str(t))
+
+            if fileclones := listdir(FILE_CLONES):
+
+                for row in INIT_DATA:
+                    if note := row.get("Note"):
+                        for m in finditer("(\\[[^\\]*]\\])(\\([^\\)]+\\))", note):
+                            link = unquote(m.group(2))
+                            try:
+                                fileclones.remove(link)
+                            except ValueError:
+                                if not fileclones:
+                                    break
+
+                print("[ INIT ]/file-clones/flush trash:", FILE_CLONES_TRASH)
+                for trash in listdir(FILE_CLONES_TRASH):
+                    remove(f"{FILE_CLONES_TRASH}/{trash}")
+
+                print("[ INIT ]/file-clones/flush unused files:", fileclones)
+                if rc.noteFileDropClonerFlushTrashing:
+                    for fileclone in fileclones:
+                        with open(path := f"{FILE_CLONES}/{fileclone}", "rb") as _if:
+                            with open(f"{FILE_CLONES_TRASH}/{fileclone}", "wb") as _of:
+                                _of.write(_if.read())
+                        remove(path)
+                else:
+                    for fileclone in fileclones:
+                        remove(f"{FILE_CLONES}/{fileclone}")
+
+    except FileNotFoundError:
+        print("[ INIT ]/file-clones first run")
+        with open(FILE_CLONES_FLUSH_TIMESTAMP, "w") as __f:
+            __f.write(str(t))
+        try:
+            mkdir(FILE_CLONES)
+        except FileExistsError:
+            pass
+        try:
+            mkdir(FILE_CLONES_TRASH)
+        except FileExistsError:
+            pass
+
+        INIT_DATA = __firstrun
+        dump_log(INIT_DATA)
+
+    print("[ INIT ]/plugin call")
     do_dump = plugin.init_log(INIT_DATA)
     make_hist = plugin.init_history(HISTORY_DATA)
 
@@ -40,24 +101,25 @@ def init():
 
     def make_history():
         global LAST_HISTORY_CREATION_TIME
-        LAST_HISTORY_CREATION_TIME = int(time())
+        LAST_HISTORY_CREATION_TIME = t
         HISTORY_DATA[HISTORY_KEYS_X_TIME_REVSORT[-1][0]] = {"time": LAST_HISTORY_CREATION_TIME, "data": INIT_DATA}
         with open(CACHE_TRADINGLOG_HISTORY, "wb") as __f:
             pickle.dump(HISTORY_DATA, __f, PICKLE_PROTOCOL)
 
     if do_dump:
+        print("[ INIT ]/plugin/journal -> dump")
         dump_log(INIT_DATA)
         make_history()
-        print(f"[HISTORY]++ (init -> do_dump)")
     elif make_hist:
-        make_history()
-        print(f"[HISTORY]++ (init -> make_hist)")
+        print("[ INIT ]/plugin/history -> dump")
+        with open(CACHE_TRADINGLOG_HISTORY, "wb") as __f:
+            pickle.dump(HISTORY_DATA, __f, PICKLE_PROTOCOL)
     else:
         newest_backup = HISTORY_DATA[HISTORY_KEYS_X_TIME_REVSORT[0][0]]["data"]
 
         if len(INIT_DATA) != len(newest_backup):
+            print("[ INIT ]/history/n-entries -> create+dump")
             make_history()
-            print(f"[HISTORY]++ (n records)")
             return
 
         initdata = INIT_DATA.copy()
@@ -67,11 +129,11 @@ def init():
 
         for ini, bku in zip(initdata, newest_backup):
             if tuple(ini.get(k) for k in comp_keys) != tuple(bku.get(k) for k in comp_keys):
+                print("[ INIT ]/history/cell-contents -> create+dump")
                 make_history()
-                print(f"[HISTORY]++ (cells changed)")
                 return
 
-        print(f"[HISTORY]|| (no changes)")
+        print("[ INIT ]/history no changes")
 
     LAST_HISTORY_CREATION_TIME = HISTORY_DATA[HISTORY_KEYS_X_TIME_REVSORT[0][0]]["time"]
 

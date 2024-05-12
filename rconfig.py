@@ -112,3 +112,69 @@ disableCopyPaste: Literal[0, 1] = 0
 disableFooterLifeSignal: Literal[0, 1] = 1
 dateFormat: Literal["ISO 8601", "american", "international", "ydm", "mdy", "dmy"] = "international"
 dateFormatFirstDayOfWeek = 1  # 0=Sunday
+
+
+# since v0.3  >
+
+
+# Note interface
+# The interface consists of a dash Markdown component (https://dash.plotly.com/dash-core-components/markdown)
+# and a CodeMirror editor (https://codemirror.net/5/).
+
+#   Styling
+notePaperDefaultTransparency: Literal[0, 1] = 1
+noteEditorDefaultTransparency: Literal[0, 1] = 1
+
+noteFileDropCloner: Literal[0, 1] = 1
+#   Enable the dropping of files, url's/link's and file paths
+#   and their automatic processing to Markdown syntax.
+#   To ensure that the page can access the file, a copy of the dropped
+#   file is created in the asset folder (this also means that updates
+#   to the original file are not applied).
+noteFileDropClonerImgAltName: Literal[0, 1] = 0
+#       Enable the alternative text for embedded images (by default,
+#       the broken image icon is shown if the file is not found).
+noteFileDropClonerFlushIntervalS: int = 2592000  # 30 days
+#       For file system maintenance, unused clone files are deleted every x days.
+noteFileDropClonerFlushTrashing: Literal[0, 1] = 1
+#           First move the clone files to a trash folder before they are
+#           completely deleted in the next iteration.
+noteLinkDropPattern: str = "^(https?:\\/\\/|www\\.)"
+#       Recognize the following pattern as url/link.
+notePathDropPattern: str = "^(\\/|[A-Z]:\\\\)"
+#       Recognize the following pattern as a filesystem path.
+
+#   Formatters
+noteMathJax: Literal[0, 1] = 0
+#       Activate the rendering of LaTeX/Mathematics.
+#       (https://dash.plotly.com/dash-core-components/markdown#latex)
+#       (https://en.wikibooks.org/wiki/LaTeX/Mathematics)
+noteCellVariableFormatter: Literal[0, 1] = 1
+#       Activate the formatter for cell variables.
+#       The string format syntax of the python library is used for this (https://docs.python.org/3/library/string.html#format-string-syntax).
+#       Thus, for example, the field 'Name' of the record can be inserted via '{Name}'
+#       (look in file plugin/__init__.py for a list of available fields).
+noteMathJaxMasker: Literal[0, 1] = 1
+#           Since the mathematical formulas often contain curly brackets, but these are
+#           part of the formatter syntax, they must be masked in order to use them as plain
+#           text (e.g. '}}' becomes '}'). This can be done automatically for the LaTeX units in the text.
+
+noteUnifying: Literal[0, 1] = 1
+#   Merge all notes matching the field Name of previous lines, in the Markdown component.
+
+
+# Keybindings
+bindKeyCodes: list[str] = [
+    'KeyC',         # copy          'c'
+    'KeyX',         # cut           'x'
+    'KeyV',         # paste         'v'
+    'KeyA',         # copy row      'a'
+    'KeyY',         # copy row      'y'
+    'KeyZ',         # copy row      'z'
+    'Space',        # autocomplete  ' '
+    'KeyI',         # note          'i'
+    'Backslash',    # note back to  '#'
+]
+
+
+# <  since v0.3

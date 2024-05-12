@@ -2,21 +2,54 @@
 .. role:: html(raw)
    :format: html
 
-===========================
 Simple Rich Trading Journal
-===========================
+###########################
 
 
 .. image:: ./.repo.doc/main.png
     :align: center
 
-0.2 #1 (2024-05-05)
-    | Autocompletion_ implemented
+0.3 #1 (2024-05-12)
+    | `Note Widget`_ implemented
+
+    | Bug fixes, improvements, code maintenance, some **variables and element ids have been renamed**.
+
     | *The project is still being worked on and some scenarios have not been tested.*
 
- The project was realized with the opensource packages from plotly_ ✨.
+ ✨ The project was realized with the opensource packages from plotly_ and CodeMirror_.
 
  :html:`<p xmlns:cc="http://creativecommons.org/ns#" >This work is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>`
+
+
+Table of Contents
+=================
+
+- `Install and Run`_
+- `Demo`_
+- `Records`_
+
+    - `General Information`_
+    - `Trades`_
+    - `Deposits`_
+    - `Payouts`_
+    - `Dividends`_
+    - `Interests, Taxes and other Costs or Income (ITC)`_
+
+- `Additional Features`_
+
+    - `Amount Calculation`_
+    - `Copy and Paste`_
+    - `Autocompletion`_
+    - `Note Widget`_
+
+        - `Get in Touch`_
+        - `General Syntax Rule`_
+        - `Markdown and LaTeX Mathematics`_
+        - `Cell Variables`_
+        - `File, Url, Link and Filepath Dropping`_
+
+- `Nice to Know`_
+- `Version History`_
 
 
 Install and Run
@@ -76,7 +109,7 @@ Create and start your own demo as follows
 Records
 =======
 
-General information
+General Information
 -------------------
 
 - The first record must be a deposit.
@@ -231,8 +264,8 @@ Supported operants and syntax:
     ============ ==============================================
 
 
-Copy/Paste
-----------
+Copy and Paste
+--------------
 
 Functions are implemented but still buggy.
 
@@ -250,7 +283,7 @@ Until now, the entire log has been recalculated after insertion, which may take 
 Currently, the following error may occur temporarily, which leads to the copy function being blocked:
 ``Uncaught (in promise) DOMException: Clipboard write was blocked due to lack of user activation.``
 
-The feature can be disabled in :html:`<a href="./rconfig.py#L111">rconfig.py</a>`.
+The feature can be deactivated by `disableCopyPaste`_.
 
 
 Autocompletion
@@ -271,7 +304,88 @@ to close the interface without confirming.
 The pool is always created when the page is loaded and is not expanded during editing.
 
 
-Nice to know
+Note Widget
+-----------
+ | (since v0.3)
+ | As before, (short) notes can be entered in the cell of the table.
+
+.. image:: ./.repo.doc/note.png
+    :align: center
+
+
+The note interface consists of a `dash Markdown component`_ as a display element
+(the note sheet) and a `CodeMirror Editor`_ (the note editor).
+
+Get in Touch
+~~~~~~~~~~~~
+
+Press ``ctrl+i`` to open the note sheet, if the note editor is not yet open, it will be
+opened the next time ``ctrl+i`` is pressed. Otherwise, the note sheet is closed.
+
+``ctrl+shift+i`` has different functions, depending on whether an element of the note
+interface is open. If neither the note sheet nor the note editor is open, the key combination
+functions as direct access to the note editor. Otherwise, the window position of the elements is switched.
+
+To return the cursor from the note editor to the journal, press ``ctrl+#``. The next time
+you press ``ctrl+i``, it jumps back to the note editor.
+
+``esc`` closes all elements of the note interface.
+
+General Syntax Rule
+~~~~~~~~~~~~~~~~~~~
+
+The dynamic integration of `cell variables`_ is active by default (`noteCellVariableFormatter`_).
+These are processed internally using the `python string format library`_. As the curly brackets
+``{}`` are part of their specifications, when using them as characters or in `LaTeX/Mathematics sections`_,
+please note that they must be masked by doubling them. This communicates to the formatter
+that it is a character and not a command: ``{{`` becomes ``{`` and ``}}`` becomes ``}``.
+As the syntax of LaTeX/Mathematics also frequently uses curly brackets, an internal (invisible)
+automation is activated by default (`noteMathJaxMasker`_), which masks the curly brackets in LaTeX/Mathematics sections.
+
+Markdown and LaTeX Mathematics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The note interface supports most expressions of the `Markdown language`_, see the
+`Markdown Guide`_ for an introduction.
+
+In addition, the rendering of |wiki-LaTeX-Mathematics|_ can be activated in `rconfig.py`_ (`noteMathJax`_).
+In the document, the sections that are written in the language must then be delimited by the
+character strings ``$$``. Due to the inclusion of various functions, the doubling should
+also be used for the inline expression, even if the original documentation provides for a simple ``$``.
+
+.. image:: ./.repo.doc/latex.png
+    :align: center
+
+Cell Variables
+~~~~~~~~~~~~~~
+
+.. image:: ./.repo.doc/cellv.png
+    :align: center
+
+The value from a cell in the row can be dynamically included in the document,
+for example the time of opening an record via ``{InvestTime}``.
+
+In the file `plugin/__init__.py`_ you will find a list of the available fields.
+
+File, Url, Link and Filepath Dropping
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: ./.repo.doc/drop.png
+    :align: center
+
+A function is implemented and activated by default that recognizes the dropping of files/images,
+urls/links and filepaths into the note editor and integrates them into the document in Markdown
+language accordingly (`noteFileDropCloner`_).
+
+To ensure that the page can access the file, a copy of the dropped file is created in the asset
+folder (this also means that updates to the original file are not applied).
+
+**Please note**: For security reasons, all browsers deny access to the file system. Therefore,
+links with the ``file:///`` protocol are not functional; hence the implementation of the FileDropClone
+feature. Depending on the browser, it is possible to grant access [for certain pages] in various ways.
+Here_ is a small excerpt on the topic related to the Firefox browser.
+
+Nice to Know
 ============
 
 - The project has so far only been tested on ``Mozilla Firefox 125.0.2`` on Linux.
@@ -307,16 +421,33 @@ Nice to know
 - Debug by reloading the page.
 
 
-Old Versions
-============
+Version History
+===============
+
+0.2 #1 (2024-05-05)
+    Autocompletion_ implemented
 
 0.1 #1 (2024-04-29)
     Initial Commit
-
 
 .. _plotly: https://plotly.com/
 .. _Python interpreter: https://www.python.org/
 .. _rconfig.py: ./rconfig.py
 .. _plugin.init_log: ./plugin/__init__.py#L22
 .. _plugin/__init__.py: ./plugin/__init__.py
-.. _Autocompletion: #autocompletion
+.. _dash Markdown component: https://dash.plotly.com/dash-core-components/markdown
+.. _CodeMirror Editor: https://codemirror.net/5/
+.. _cell variables: #cell-variables
+.. _python string format library: https://docs.python.org/3/library/string.html#format-string-syntax
+.. _LaTeX/Mathematics sections: #markdown-and-latex-mathematics
+.. _Markdown language: https://en.wikipedia.org/wiki/Markdown
+.. _Markdown Guide: https://www.markdownguide.org/
+.. |wiki-LaTeX-Mathematics| replace:: LaTeX/Mathematics
+.. _wiki-LaTeX-Mathematics: https://en.wikibooks.org/wiki/LaTeX/Mathematics
+.. _CodeMirror: https://codemirror.net/5/
+.. _Here: ./.repo.doc/~user.js
+.. _noteCellVariableFormatter: ./rconfig.py#L152
+.. _noteFileDropCloner: ./rconfig.py#L128
+.. _noteMathJax: ./rconfig.py#L148
+.. _noteMathJaxMasker: ./rconfig.py#L157
+.. _disableCopyPaste: ./rconfig.py#L111

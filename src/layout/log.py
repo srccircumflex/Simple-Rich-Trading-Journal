@@ -26,7 +26,7 @@ _columns_ = [
                 "field": "id",
                 "hide": not __debug,
                 "width": 50
-            }
+            },
         ]
     },
     {
@@ -261,7 +261,7 @@ _dashGridOptions = {
 }
 
 tradinglog = dag.AgGrid(
-    id="tradinglog_",
+    id="logElement",
     columnDefs=__columns,
     defaultColDef=_default_col_def,
     dashGridOptions=_dashGridOptions,

@@ -93,3 +93,4 @@ if _plugin:
 rc.logColWidths[1] = 70
 rc.logColWidths[2] = 70
 rc.statisticsGroupByType = 1
+rc.noteMathJax = 1

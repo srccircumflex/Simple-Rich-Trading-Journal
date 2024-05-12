@@ -1,12 +1,7 @@
-from dash import callback, clientside_callback, ClientsideFunction, Output, Input, callback_context, no_update, State
+from dash import callback, Output, Input, callback_context, no_update, State
+
 from src import layout
 from src.config import styles
-
-clientside_callback(
-    ClientsideFunction(namespace="clientside", function_name="c2Hide"),
-    Output(layout.c2Hide_trigger, "n_clicks"),
-    Input(layout.c2Hide_trigger, "n_clicks"),
-)
 
 
 @callback(
