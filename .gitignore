@@ -164,3 +164,8 @@ src/cache/~cache/
 demo/*.pkl
 prconfig.py
 .notes/
+src/cache/.fc*
+src/assets/fc
+!src/assets/fc/_ex.png
+!src/assets/fc/_ex2.png
+!src/assets/fc/_ex3.png
