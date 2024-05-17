@@ -9,12 +9,15 @@ Simple Rich Trading Journal
 .. image:: ./.repo.doc/main.png
     :align: center
 
-0.3 #1 (2024-05-12)
+0.3 #2 (2024-05-12)
     | `Note Widget`_ implemented
 
     | Bug fixes, improvements, code maintenance, some **variables and element ids have been renamed**.
 
     | *The project is still being worked on and some scenarios have not been tested.*
+
+        #2
+            Unset cells of the table are formatted in the note interface with ``{*N/A*}`` (md). Module ``config.msg`` created.
 
  ✨ The project was realized with the opensource packages from plotly_ and CodeMirror_.
 

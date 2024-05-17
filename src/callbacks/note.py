@@ -9,16 +9,15 @@ from urllib.parse import quote
 from dash import callback, Output, Input, State, no_update
 
 from src import layout, FILE_CLONES, FILE_CLONES_URL
-from src.config import rc
+from src.config import rc, msg
 
 
 if rc.noteCellVariableFormatter:
     from string import Formatter
 
     class _Formatter(Formatter):
-        def __init__(self, missing='{??}', bad_fmt='{!!}'):
-            self.missing = missing
-            self.bad_fmt = bad_fmt
+        def get_value(self, key, args, kwargs):
+            return msg.note_error_none if (v := kwargs[key]) is None else v
 
         def get_field(self, field_name, args, kwargs):
             try:
@@ -29,17 +28,17 @@ if rc.noteCellVariableFormatter:
 
         def format_field(self, value, spec):
             if value is None:
-                return self.missing
+                return msg.note_error_missing_field
             try:
                 return super().format_field(value, spec)
             except ValueError:
-                return self.bad_fmt
+                return msg.note_error_bad_format
 
         def format(self, __format_string, kwargs):
             try:
                 return self.vformat(__format_string, (), kwargs)
             except ValueError as e:
-                return f"# **{e.__class__.__name__}**\n\n## _{e}_"
+                return msg.note_error_fatal.format(error=e)
 
 
     _formatter = _Formatter()
@@ -48,25 +47,25 @@ if rc.noteCellVariableFormatter:
         return _formatter.format(
             __content,
             {
-                  "cat": "N/A",
-                  "Name": "N/A",
-                  "Symbol": "N/A",
-                  "Type": "N/A",
-                  "n": "N/A",
-                  "InvestTime": "N/A",
-                  "InvestAmount": "N/A",
-                  "InvestCourse": "N/A",
-                  "TakeTime": "N/A",
-                  "TakeAmount": "N/A",
-                  "TakeCourse": "N/A",
-                  "ITC": "N/A",
-                  "Performance": "N/A",
-                  "Profit": "N/A",
-                  "Dividend": "N/A",
-                  "Note": "N/A",
-                  "HoldTime": "N/A",
-                  "Performance/Day": "N/A",
-                  "Profit/Day": "N/A",
+                  "cat": None,
+                  "Name": None,
+                  "Symbol": None,
+                  "Type": None,
+                  "n": None,
+                  "InvestTime": None,
+                  "InvestAmount": None,
+                  "InvestCourse": None,
+                  "TakeTime": None,
+                  "TakeAmount": None,
+                  "TakeCourse": None,
+                  "ITC": None,
+                  "Performance": None,
+                  "Profit": None,
+                  "Dividend": None,
+                  "Note": None,
+                  "HoldTime": None,
+                  "Performance/Day": None,
+                  "Profit/Day": None,
               } | __row
         )
     if rc.noteMathJax and rc.noteMathJaxMasker:
