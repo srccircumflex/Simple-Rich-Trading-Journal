@@ -5,9 +5,9 @@ try:
 except Exception:
     raise
 
-from __version__ import __project_name__
-
 from dash import Dash
+
+from __version__ import __project_name__
 from src import DASH_ASSETS, layout
 
 

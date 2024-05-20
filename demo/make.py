@@ -140,7 +140,7 @@ def randrate2():
     return randint(30, 4_90) / 100_00
 
 
-def make():
+def make(years=3):
     class _Money:
         cash = 0.0
 
@@ -160,7 +160,7 @@ def make():
         ex[-1] = randint(10, 200_00) / 100
 
     now = datetime.now()
-    time = now - timedelta(365 * 10)
+    time = now - timedelta(365 * years)
 
     def deposit():
         amount = (randint(10, 60) / 2) * 100

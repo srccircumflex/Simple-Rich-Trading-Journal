@@ -1,4 +1,5 @@
 import pickle
+from ast import literal_eval
 
 from rconfig import *
 try:
@@ -6,8 +7,47 @@ try:
 except ImportError:
     pass
 
-from .. import ROOT, CACHE_COLORS
 from . import color_theme
+from src import ROOT, CACHE_ROOT, CACHE_COLORS, template_CACHE_TRADINGLOG, template_CACHE_TRADINGLOG_HISTORY
+
+import rconfig
+from sys import argv as _argv
+_argv = _argv[1:]
+
+profile_name = ""
+CACHE_TRADINGLOG = CACHE_ROOT + (template_CACHE_TRADINGLOG % profile_name)
+CACHE_TRADINGLOG_HISTORY = CACHE_ROOT + (template_CACHE_TRADINGLOG_HISTORY % profile_name)
+
+if len(_argv) == 1:
+    profile_name = _argv[0]
+    _arg = "-" + profile_name
+    CACHE_TRADINGLOG = CACHE_ROOT + (template_CACHE_TRADINGLOG % _arg)
+    CACHE_TRADINGLOG_HISTORY = CACHE_ROOT + (template_CACHE_TRADINGLOG_HISTORY % _arg)
+else:
+    _globals = globals()
+    while _argv:
+        _config_key = _argv.pop(0)
+        if _config_key == "-":
+            profile_name = _argv.pop(0)
+            _arg = "-" + profile_name
+            CACHE_TRADINGLOG = CACHE_ROOT + (template_CACHE_TRADINGLOG % _arg)
+            CACHE_TRADINGLOG_HISTORY = CACHE_ROOT + (template_CACHE_TRADINGLOG_HISTORY % _arg)
+        elif _config_key.endswith("]"):
+            _config_key, _idx = _config_key[:-1].split("[")
+            _attr = getattr(rconfig, _config_key)
+            _attr.__setitem__(int(_idx), type(_attr[0])(_argv.pop(0)))
+        elif (_attrt := type(_attr := getattr(rconfig, _config_key))) is list:
+            _arg = _argv.pop(0)
+            if not _arg.startswith("["):
+                raise ValueError(f"{_config_key!r} requires a value of type <list> whose pattern corresponds to [1, 2, ...]. {_arg!r} is received.")
+            while not _arg.endswith("]"):
+                _arg += _argv.pop(0)
+            _globals[_config_key] = literal_eval(_arg)
+        else:
+            _globals[_config_key] = _attrt(_argv.pop(0))
+
+
+color_theme._load_theme(colorTheme)
 
 
 dateFormat = {"ISO 8601": "ydm", "american": "mdy", "international": "dmy"}.get(dateFormat, dateFormat)
@@ -155,13 +195,13 @@ if useDefaultAltColors:
     color_theme.cell_negvalue = color_theme.alt_neg
     color_theme.cell_posvalue = color_theme.alt_pos
 
-_i = 0
+_idx = 0
 
 
 def get_footer_live_signal():
-    global _i
-    _i += 1
-    if _i % 2:
+    global _idx
+    _idx += 1
+    if _idx % 2:
         return {"borderTop": "1px solid " + color_theme.footer_sig2}
     else:
         return {"borderTop": "1px solid " + color_theme.footer_sig1}

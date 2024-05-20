@@ -382,17 +382,21 @@ def call(
                 o_scope_by_button_style = i_scope_by_button_style | styles.misc.by_index_off
                 o_scope_by_button_children = "Scope\u2007by\u2007Both\u2007"
             cache.init()
-            _course_call = plugin.course_call
-            course_call = plugin.course_call
+
             if rc.startupFlushOpenTakeAmount:
+                _course_call = plugin.course_call
+
                 def course_call(row, _):
                     row.pop("TakeAmount", None)
                     row.pop("TakeCourse", None)
                     return True
 
-            plugin.course_call = course_call
+                plugin.course_call = course_call
+                new_table(cache.INIT_DATA)
+                plugin.course_call = _course_call
+
             new_table(cache.INIT_DATA)
-            plugin.course_call = _course_call
+
             o_backup_list_options = layout.make.make_history_list(cache.HISTORY_KEYS_X_TIME_REVSORT)
             o_open_positions_graph_figure, o_all_positions_graph_figure, o_performance_graph_figure, o_BALANCE_children, o_drag_container_style = new_side(group_by, scope_by_attr, i_performance_steps_value, i_performance_trailing_frame_value, i_performance_trailing_interval_value, i_performance_range_value, i_drag_event_receiver_value, i_drag_container_style, i_performance_size_slider_value, i_Y_trigger_, i_Q_trigger_, i_T_trigger_, i_C_trigger_, i_STATISTICS_style, i_BALANCE_style)
             o_init_done_trigger_n_clicks = 1

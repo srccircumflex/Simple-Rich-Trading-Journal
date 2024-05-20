@@ -138,3 +138,22 @@ noteeditor_dialog_overwrite = "#d50a0a61"
 
 
 # <  since v0.3
+
+def _load_theme(theme):
+    match theme:
+        case "dark":
+            from . import dark as theme
+        case "light":
+            from . import light as theme
+        case "blank":
+            from . import blank as theme
+        case _:
+            return
+
+    _globals = globals()
+
+    for attr in theme.__dir__():
+        if attr.startswith("_"):
+            continue
+        _globals[attr] = getattr(theme, attr)
+

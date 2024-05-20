@@ -9,7 +9,7 @@ Simple Rich Trading Journal
 .. image:: ./.repo.doc/main.png
     :align: center
 
-0.3 #2 (2024-05-12)
+0.3 #4 (2024-05-12)
     | `Note Widget`_ implemented
 
     | Bug fixes, improvements, code maintenance, some **variables and element ids have been renamed**.
@@ -18,6 +18,12 @@ Simple Rich Trading Journal
 
         #2
             Unset cells of the table are formatted in the note interface with ``{*N/A*}`` (md). Module ``config.msg`` created.
+
+        #4
+            | Light `color theme`_ added.
+            | You can now create several journals (see `commandline`_).
+            | Configurations can now be transferred via the `commandline`_.
+            | `Demo`_\ s can now be created for a certain number of years.
 
  ✨ The project was realized with the opensource packages from plotly_ and CodeMirror_.
 
@@ -52,6 +58,10 @@ Table of Contents
         - `File, Url, Link and Filepath Dropping`_
 
 - `Nice to Know`_
+
+    - `General`_
+    - `Commandline`_
+
 - `Version History`_
 
 
@@ -107,6 +117,21 @@ Create and start your own demo as follows
 
     > python demo make='your demo id'
     > python demo 'your demo id'
+
+By default, a sample journal is created with random data for the last three years.
+A custom number of years can be defined via the demo id:
+
+::
+
+    > python demo make='your demo id#9'
+    > python demo 'your demo id#9'
+
+For an example of how the `plugins`_ work, use the keyword ``plugin``.
+**Please note**: in this case there must be an ``-`` in front of your id.
+
+::
+
+    > python demo - 'your demo id' plugin
 
 
 Records
@@ -391,6 +416,9 @@ Here_ is a small excerpt on the topic related to the Firefox browser.
 Nice to Know
 ============
 
+General
+-------
+
 - The project has so far only been tested on ``Mozilla Firefox 125.0.2`` on Linux.
 
 - Before the log is (further) edited, large calculations should be completed.
@@ -424,6 +452,30 @@ Nice to Know
 - Debug by reloading the page.
 
 
+Commandline
+-----------
+
+By default, SRTJ does not expect any command line parameters.
+
+In addition to the main journal, further journals can be created/called up via the command line.
+
+::
+
+    > python main.py 'your journal id'
+
+In addition, configurations from `rconfig.py`_ can be transferred via the command line.
+If this is done in addition to the transfer of a custom journal id, this must be specified
+with the key ``-``.
+The command line parser supports the transfer of lists in python syntax for the definition
+of such configurations, note that string types are defined with quotation marks
+(otherwise, do not pay attention to these).
+Alternatively, only a field of a list can be defined.
+
+::
+
+    > python main.py - 'your journal id' colorTheme light scopeByIndex 0 logColOrder [1, 3, 4, 5,2,6,7, 8] logColWidths[2] 100
+
+
 Version History
 ===============
 
@@ -438,6 +490,7 @@ Version History
 .. _rconfig.py: ./rconfig.py
 .. _plugin.init_log: ./plugin/__init__.py#L22
 .. _plugin/__init__.py: ./plugin/__init__.py
+.. _plugins: ./plugin/__init__.py
 .. _dash Markdown component: https://dash.plotly.com/dash-core-components/markdown
 .. _CodeMirror Editor: https://codemirror.net/5/
 .. _cell variables: #cell-variables
@@ -453,3 +506,4 @@ Version History
 .. _noteMathJax: ./rconfig.py#L148
 .. _noteMathJaxMasker: ./rconfig.py#L157
 .. _disableCopyPaste: ./rconfig.py#L111
+.. _color theme: ./rconfig.py#L185

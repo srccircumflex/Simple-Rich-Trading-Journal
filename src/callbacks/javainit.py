@@ -46,10 +46,13 @@ clientside_callback(
         make_autocomplete()
         make_note(%d)
         
+        document.documentElement.setAttribute("data-bs-theme", %r)
+        
         return window.dash_clientside.no_update
     }""" % (
         rc.disableCopyPaste,
-        rc.noteFileDropCloner
+        rc.noteFileDropCloner,
+        ("dark" if rc.colorTheme == "dark" else "light")
     ),
     Output(layout.init_done_trigger, "id"),
     Input(layout.init_done_trigger, "n_clicks"),

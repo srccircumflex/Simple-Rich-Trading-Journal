@@ -104,8 +104,10 @@
 	font-size: 0px !important;
 }
 .autocdropdown > .Select-menu-outer {
-    font-size: 13px
-    color: black;
+    font-size: 13px;
+    color: #8f8f8f;
+    font-weight: bold;
+    border: 2px solid;
 }
 /* < autocomplete */
 

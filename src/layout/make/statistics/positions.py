@@ -4,7 +4,7 @@ from typing import Literal
 import plotly.graph_objects as go
 
 from src.calc.log import LogCalc, _Trade
-from src.config import rc
+from src.config import rc, styles
 
 
 class _Positions:
@@ -250,14 +250,14 @@ class _Positions:
             )
 
             self.open_figure.update_layout(
-                dict(plot_bgcolor="#2d3436", paper_bgcolor="#2d3436"),
-                font=dict(color='#dedddc'),
+                dict(plot_bgcolor=styles.figures.color_bg_plot, paper_bgcolor=styles.figures.color_bg_paper),
+                font=dict(color=styles.figures.color_fg_plot),
                 margin=dict(t=0, l=0, r=0, b=0),
             )
 
             self.all_figure.update_layout(
-                dict(plot_bgcolor="#2d3436", paper_bgcolor="#2d3436"),
-                font=dict(color='#dedddc'),
+                dict(plot_bgcolor=styles.figures.color_bg_plot, paper_bgcolor=styles.figures.color_bg_paper),
+                font=dict(color=styles.figures.color_fg_plot),
                 margin=dict(t=0, l=0, r=0, b=0),
             )
 

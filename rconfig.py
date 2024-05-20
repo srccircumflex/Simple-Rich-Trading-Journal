@@ -178,3 +178,10 @@ bindKeyCodes: list[str] = [
 
 
 # <  since v0.3
+
+
+# since v0.3 #4 >
+
+colorTheme: Literal["dark", "light", "blank"] = "dark"
+
+# <  since v0.3 #4

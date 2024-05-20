@@ -3,8 +3,9 @@ from re import sub
 ROOT = sub("[^/\\\\]+$", "", __file__)
 
 CACHE_ROOT = ROOT + "/cache"
-CACHE_TRADINGLOG = CACHE_ROOT + "/tradinglog.pkl"
-CACHE_TRADINGLOG_HISTORY = CACHE_ROOT + "/tradinglog-history.pkl"
+
+template_CACHE_TRADINGLOG = "/tradinglog%s.pkl"
+template_CACHE_TRADINGLOG_HISTORY = "/tradinglog%s-history.pkl"
 
 DASH_ASSETS = ROOT + "/assets"
 

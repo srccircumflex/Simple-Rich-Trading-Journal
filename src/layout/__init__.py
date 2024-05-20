@@ -66,9 +66,9 @@ LAYOUT = html.Div(
                                         ),
                                     ],
                                     style={
-                                        "width": "100%",
-                                        "display": "flex"
-                                    } | styles.misc.header
+                                              "width": "100%",
+                                              "display": "flex"
+                                          } | styles.misc.header
                                 ),
                             ],
                             id="gridR1"
@@ -89,8 +89,8 @@ LAYOUT = html.Div(
                                 split_handle := html.Div(
                                     id="gridSplitter",
                                     style={
-                                        "height": "inherit",
-                                    } | (styles.misc.balance_split_handle if rc.sideInitBalance else styles.misc.statistics_split_handle),
+                                              "height": "inherit",
+                                          } | (styles.misc.balance_split_handle if rc.sideInitBalance else styles.misc.statistics_split_handle),
                                     className="noselect"
                                 ),
                                 c_2 := html.Div(
@@ -170,11 +170,24 @@ LAYOUT = html.Div(
         summary_footer := html.Div(
             id="gridR3",
             style={
-                      "width": "100%",
-                      "position": "absolute",
-                      "bottom": 0,
-                  } | styles.misc.summary_footer
+                "width": "100%",
+                "position": "absolute",
+                "bottom": 0,
+            } | styles.misc.summary_footer
         ),
+        (html.Div(
+            rc.profile_name,
+            style={
+                "position": "absolute",
+                "bottom": 0,
+                "left": 0,
+                "fontSize": 12,
+                "borderTop": "2px outset",
+                "borderRight": "2px outset",
+                "paddingLeft": 3,
+                "paddingRight": 4,
+            } | styles.misc.summary_footer | {"backgroundColor": ""}
+        ) if rc.profile_name else html.Div()),
         init_trigger := html.Div(id="init_trigger_"),
         init_done_trigger := html.Div(id="init_done_trigger_"),
         autocomplet.COMPONENTS,

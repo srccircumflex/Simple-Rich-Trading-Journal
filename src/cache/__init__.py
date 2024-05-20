@@ -7,7 +7,7 @@ from os import mkdir, listdir, remove
 from urllib.parse import unquote
 from re import finditer
 
-from src import CACHE_TRADINGLOG, CACHE_TRADINGLOG_HISTORY, FILE_CLONES, FILE_CLONES_FLUSH_TIMESTAMP, FILE_CLONES_TRASH
+import src
 from src.config import rc
 import plugin
 
@@ -25,31 +25,31 @@ def init():
     __firstrun = [{"id": 0, "n": 0, "InvestTime": datetime.now().strftime(rc.timeFormatTransaction), "InvestAmount": 1}]
     t = int(time())
     try:
-        print("[ INIT ]/journal load:", CACHE_TRADINGLOG)
-        with open(CACHE_TRADINGLOG, "rb") as __f:
+        print("[ INIT ]/journal load:", rc.CACHE_TRADINGLOG)
+        with open(rc.CACHE_TRADINGLOG, "rb") as __f:
             INIT_DATA = pickle.load(__f)
     except FileNotFoundError:
         print("[ INIT ]/journal first run:", __firstrun)
         INIT_DATA = __firstrun
         dump_log(INIT_DATA)
     try:
-        print("[ INIT ]/history load:", CACHE_TRADINGLOG_HISTORY)
-        with open(CACHE_TRADINGLOG_HISTORY, "rb") as __f:
+        print("[ INIT ]/history load:", rc.CACHE_TRADINGLOG_HISTORY)
+        with open(rc.CACHE_TRADINGLOG_HISTORY, "rb") as __f:
             HISTORY_DATA = pickle.load(__f)
     except FileNotFoundError:
         print("[ INIT ]/history first run:", __firstrun)
         HISTORY_DATA = {i: {"time": i, "data": __firstrun} for i in range(rc.nHistorySlots)}
 
     try:
-        print("[ INIT ]/file-clones/flush load:", FILE_CLONES_FLUSH_TIMESTAMP)
-        with open(FILE_CLONES_FLUSH_TIMESTAMP) as __f:
+        print("[ INIT ]/file-clones/flush load:", src.FILE_CLONES_FLUSH_TIMESTAMP)
+        with open(src.FILE_CLONES_FLUSH_TIMESTAMP) as __f:
             timestamp = int(__f.read())
         if timestamp + rc.noteFileDropClonerFlushIntervalS < t:
             print("[ INIT ]/file-clones/flush start")
-            with open(FILE_CLONES_FLUSH_TIMESTAMP, "w") as __f:
+            with open(src.FILE_CLONES_FLUSH_TIMESTAMP, "w") as __f:
                 __f.write(str(t))
 
-            if fileclones := listdir(FILE_CLONES):
+            if fileclones := listdir(src.FILE_CLONES):
 
                 for row in INIT_DATA:
                     if note := row.get("Note"):
@@ -61,31 +61,31 @@ def init():
                                 if not fileclones:
                                     break
 
-                print("[ INIT ]/file-clones/flush trash:", FILE_CLONES_TRASH)
-                for trash in listdir(FILE_CLONES_TRASH):
-                    remove(f"{FILE_CLONES_TRASH}/{trash}")
+                print("[ INIT ]/file-clones/flush trash:", src.FILE_CLONES_TRASH)
+                for trash in listdir(src.FILE_CLONES_TRASH):
+                    remove(f"{src.FILE_CLONES_TRASH}/{trash}")
 
                 print("[ INIT ]/file-clones/flush unused files:", fileclones)
                 if rc.noteFileDropClonerFlushTrashing:
                     for fileclone in fileclones:
-                        with open(path := f"{FILE_CLONES}/{fileclone}", "rb") as _if:
-                            with open(f"{FILE_CLONES_TRASH}/{fileclone}", "wb") as _of:
+                        with open(path := f"{src.FILE_CLONES}/{fileclone}", "rb") as _if:
+                            with open(f"{src.FILE_CLONES_TRASH}/{fileclone}", "wb") as _of:
                                 _of.write(_if.read())
                         remove(path)
                 else:
                     for fileclone in fileclones:
-                        remove(f"{FILE_CLONES}/{fileclone}")
+                        remove(f"{src.FILE_CLONES}/{fileclone}")
 
     except FileNotFoundError:
         print("[ INIT ]/file-clones first run")
-        with open(FILE_CLONES_FLUSH_TIMESTAMP, "w") as __f:
+        with open(src.FILE_CLONES_FLUSH_TIMESTAMP, "w") as __f:
             __f.write(str(t))
         try:
-            mkdir(FILE_CLONES)
+            mkdir(src.FILE_CLONES)
         except FileExistsError:
             pass
         try:
-            mkdir(FILE_CLONES_TRASH)
+            mkdir(src.FILE_CLONES_TRASH)
         except FileExistsError:
             pass
 
@@ -103,7 +103,7 @@ def init():
         global LAST_HISTORY_CREATION_TIME
         LAST_HISTORY_CREATION_TIME = t
         HISTORY_DATA[HISTORY_KEYS_X_TIME_REVSORT[-1][0]] = {"time": LAST_HISTORY_CREATION_TIME, "data": INIT_DATA}
-        with open(CACHE_TRADINGLOG_HISTORY, "wb") as __f:
+        with open(rc.CACHE_TRADINGLOG_HISTORY, "wb") as __f:
             pickle.dump(HISTORY_DATA, __f, PICKLE_PROTOCOL)
 
     if do_dump:
@@ -112,7 +112,7 @@ def init():
         make_history()
     elif make_hist:
         print("[ INIT ]/plugin/history -> dump")
-        with open(CACHE_TRADINGLOG_HISTORY, "wb") as __f:
+        with open(rc.CACHE_TRADINGLOG_HISTORY, "wb") as __f:
             pickle.dump(HISTORY_DATA, __f, PICKLE_PROTOCOL)
     else:
         newest_backup = HISTORY_DATA[HISTORY_KEYS_X_TIME_REVSORT[0][0]]["data"]
@@ -139,5 +139,5 @@ def init():
 
 
 def dump_log(data: list[dict]):
-    with open(CACHE_TRADINGLOG, "wb") as __f:
+    with open(rc.CACHE_TRADINGLOG, "wb") as __f:
         pickle.dump(data, __f, PICKLE_PROTOCOL)
