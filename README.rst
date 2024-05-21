@@ -9,12 +9,10 @@ Simple Rich Trading Journal
 .. image:: ./.repo.doc/main.png
     :align: center
 
-0.3 #4 (2024-05-12)
+0.3 #5 (2024-05-12)
     | `Note Widget`_ implemented
 
     | Bug fixes, improvements, code maintenance, some **variables and element ids have been renamed**.
-
-    | *The project is still being worked on and some scenarios have not been tested.*
 
         #2
             Unset cells of the table are formatted in the note interface with ``{*N/A*}`` (md). Module ``config.msg`` created.
@@ -24,6 +22,11 @@ Simple Rich Trading Journal
             | You can now create several journals (see `commandline`_).
             | Configurations can now be transferred via the `commandline`_.
             | `Demo`_\ s can now be created for a certain number of years.
+
+        #5
+            An bug has been fixed which led to an incorrect calculation of the ITC column of Dividends_.
+
+    *The project is still being worked on and some scenarios have not been tested.*
 
  ✨ The project was realized with the opensource packages from plotly_ and CodeMirror_.
 

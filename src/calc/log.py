@@ -789,7 +789,11 @@ class LogCalc:
                     pre_d.add_dividend(row.amount)
                 for pre_t in pre_trades:
                     if pre_t.row_dat["Name"] == row.name:
-                        row.add_trade(pre_t)
+                        if isinstance(pre_t, TradeFinalized):
+                            if pre_t._min_date <= row.index_date < pre_t._max_date:
+                                row.add_trade(pre_t)
+                        else:
+                            row.add_trade(pre_t)
             elif isinstance(row, Itc):
                 row.add_deposits(pre_deposits)
             elif is_calc_trade():

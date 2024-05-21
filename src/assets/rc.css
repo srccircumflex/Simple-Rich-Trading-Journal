@@ -1,8 +1,8 @@
 /* [do not change] this file is created by `rc' */
 
 /* agGrid Input color > */
-.ag-theme-balham input[class^=ag-] {
-  color: #000000 !important;
+.ag-theme-balham-auto-dark input[class^=ag-] {
+  color: #e3e3e3 !important;
 }
 /* < agGrid Input color */
 
@@ -22,7 +22,7 @@
 .CodeMirror {
   height: 100%;
   width: 100%;
-  background-color: #ffffffee;
+  background-color: #ffffffdd;
 }
 .CodeMirror-gutters {
   background-color: #f7f7f7;
