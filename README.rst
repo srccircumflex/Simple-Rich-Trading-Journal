@@ -118,7 +118,7 @@ Create and start your own demo as follows
 
 ::
 
-    > python demo make='your demo id'
+    > python demo make='your demo id' -
     > python demo 'your demo id'
 
 By default, a sample journal is created with random data for the last three years.
