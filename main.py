@@ -11,6 +11,9 @@ from __version__ import __project_name__
 from src import DASH_ASSETS, layout
 
 
+raise DeprecationWarning("We are relocated → https://github.com/Simple-Rich-Trading-Journal")
+
+
 def run():
     app = Dash(
         __project_name__,
